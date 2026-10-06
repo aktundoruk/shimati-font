@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="ecircumflex" format="2">
-  <advance width="564"/>
+  <advance width="569"/>
   <unicode hex="00EA"/>
   <anchor x="276" y="0" name="bottom"/>
   <anchor x="406" y="13" name="ogonek"/>

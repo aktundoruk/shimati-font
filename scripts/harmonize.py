@@ -39,6 +39,9 @@ TERMINAL_K_EXTRABOLD = 1.0
 TERMINAL_LENGTH = 0.5
 # ExtraBold'da aynı ölçek: 0 = Regular'ın kısa kesim konumu (göreli), 1 = Inter'in uç noktası.
 TERMINAL_LENGTH_EXTRABOLD = 0.25
+# Hangi uçlar dik kesilsin: "top" = a'nın (ve æ, ª'nın a kısmının) kemeri, "bottom" = e'nin kuyruğu.
+# e, Inter'in orijinal açılı ucuyla bırakılıyor.
+CUT_TERMINALS = ("top",)
 # æ iki bölmeli ve sıkışık; Black ötesine ekstrapolasyon a ile e arasındaki boşlukları kapatıyor.
 AE_TY_CAP = 1.2
 # Boşluk düzeltmesi bu nötr harflere göre yapılır (kerning gerektirmeyen ortaklar).
@@ -168,6 +171,7 @@ def harmonize(variant):
             "stem": stem_n(s_n, xh),
             "oside": o_side(s_o),
             "otop": o_top(s_o),
+            "etop": o_top(s_e),  # Sen e'sinin üst çizgisi (o'dan ince)
             "n_ink": ink(s_n),
             "o_ink": ink(s_o),
             "e_ink": ink(s_e),
@@ -181,7 +185,7 @@ def harmonize(variant):
             n: (ink(SenGlyph(sen, n)), sen[n].width, {a.name: (a.x, a.y) for a in sen[n].anchors})
             for n in ("a", "e", "ae")
         }
-        log[m] = {"xHeight": xh, "targets": {k: round(v, 1) if isinstance(v, float) else v for k, v in tgt.items() if k in ("stem", "oside", "otop")}}
+        log[m] = {"xHeight": xh, "targets": {k: round(v, 1) if isinstance(v, float) else v for k, v in tgt.items() if k in ("stem", "oside", "otop", "etop")}}
 
         for name in "ae":
             ig = inter[name]
@@ -191,8 +195,12 @@ def harmonize(variant):
                 tx = ty = t
                 ymap = lambda y: y  # noqa: E731
             else:
-                # y: Inter o'sunun üst kalınlığı Sen o'sununkine eşit olsun
-                ty = solve(lambda t: o_top(inter["o"].at(0, t)) * sy, tgt["otop"])
+                # y: a için Inter o'sunun üst kalınlığı Sen o'sununkine; e için Inter e'sininki
+                # Sen e'sininkine eşit olsun (Sen'in e'si o'sundan ince, yoksa e'nin ağzı kapanıyor)
+                if name == "e":
+                    ty = solve(lambda t: o_top(ig.at(0, t)) * sy, tgt["etop"])
+                else:
+                    ty = solve(lambda t: o_top(inter["o"].at(0, t)) * sy, tgt["otop"])
                 # x: genişlik ve dikey kalınlık birlikte çözülür
                 tx = 0.0
                 for _ in range(6):
@@ -329,6 +337,8 @@ def apply_terminals(g, master, cuts, term_rel, scale=1.0):
     x0, w = min(xs), max(xs) - min(xs)
     for k, (ci, i) in enumerate(find_terminals(g)):
         kind = "top" if g.contours[ci].points[i].y > mid else "bottom"
+        if kind not in CUT_TERMINALS:
+            continue
         key = (g.name, k)
         x_outer = _outer_tip_x(g, ci, i)
         if master == "Regular":

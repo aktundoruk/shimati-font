@@ -5,7 +5,8 @@
    "targets": {
     "stem": 82.0,
     "oside": 85.0,
-    "otop": 80.0
+    "otop": 80.0,
+    "etop": 80.0
    },
    "a": {
     "inter_weight_x": 408,
@@ -72,7 +73,8 @@
    "targets": {
     "stem": 172.0,
     "oside": 185.0,
-    "otop": 165.0
+    "otop": 165.0,
+    "etop": 141.9
    },
    "a": {
     "inter_weight_x": 844,
@@ -141,7 +143,8 @@
    "targets": {
     "stem": 82.0,
     "oside": 85.0,
-    "otop": 80.0
+    "otop": 80.0,
+    "etop": 80.0
    },
    "a": {
     "inter_weight_x": 373,
@@ -175,7 +178,7 @@
    },
    "e": {
     "inter_weight_x": 389,
-    "inter_weight_y": 464,
+    "inter_weight_y": 478,
     "scale_x": 0.4771,
     "scale_y": 0.4472,
     "width": 569,
@@ -196,9 +199,9 @@
       84
      ],
      "vruns@center": [
-      83,
+      85,
       72,
-      82
+      84
      ]
     }
    },
@@ -233,7 +236,7 @@
     },
     "e": {
      "lsb": 0,
-     "rsb": -5
+     "rsb": 0
     },
     "ae": {
      "lsb": 0,
@@ -296,7 +299,8 @@
    "targets": {
     "stem": 172.0,
     "oside": 185.0,
-    "otop": 165.0
+    "otop": 165.0,
+    "etop": 141.9
    },
    "a": {
     "inter_weight_x": 866,
@@ -330,7 +334,7 @@
    },
    "e": {
     "inter_weight_x": 874,
-    "inter_weight_y": 1122,
+    "inter_weight_y": 1020,
     "scale_x": 0.4645,
     "scale_y": 0.4562,
     "width": 586,
@@ -351,9 +355,9 @@
       175
      ],
      "vruns@center": [
-      160,
-      114,
-      162
+      148,
+      108,
+      151
      ]
     }
    },
@@ -388,11 +392,11 @@
     },
     "e": {
      "lsb": 0,
-     "rsb": -13
+     "rsb": 0
     },
     "ae": {
      "lsb": -8,
-     "rsb": -11
+     "rsb": 0
     }
    },
    "kerning": [

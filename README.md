@@ -19,14 +19,16 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 - Dikey ölçek: Inter x-height'i (1118) Sen x-height'ine (500 / 510).
 - Genişlik: `e` → Sen'in kendi `e` genişliği; `a` → Sen `n` genişliği × Inter'deki a/n oranı.
 - Dikey kalınlık: `a` gövdesi Sen `n` gövdesine, `e` yan kalınlığı Sen `o` yanına eşit.
-- Yatay kalınlık: Inter `o` üst kalınlığı Sen `o` üst kalınlığına eşit; a/e Inter'in kendi oranlarını korur.
+- Yatay kalınlık: `a` için Inter `o` üst kalınlığı Sen `o`'suna; `e` için Inter `e` üst kalınlığı Sen'in kendi
+  `e`'sine eşitlenir (Sen'in ExtraBold `e`'si `o`'sundan ince: 142 / 165, aksi hâlde `e`'nin ağzı kapanıyor).
 - Overshoot: Inter'in taşma payları Sen `o`'sununkilere eşlenir.
 - Boşluk: Inter'in a/e ile o/n arasındaki oranları, Sen'in o/n değerlerine uygulanır.
 - Aksanlı harfler ve `œ` yeni çapalara/genişliklere göre yeniden konumlandırılır.
-- Terminaller Sen gibi dik kesilir (`scripts/terminals.py`). Önce Sen'deki kadar kısa kesim konumu
-  bulunur (kesik ≤ 1.25 × Sen'in `c`/`e` kesiği); `TERMINAL_LENGTH` (Regular 0.5, ExtraBold 0.25) kesimi
-  bu konumdan Inter'in orijinal uç noktasına doğru kaydırır. İç kenar, dış kenarın yönü ile kendi
-  yönünün ortasına göre yeniden kurulur. ExtraBold'da daha uzun uç, `e`'nin ağzını kapatıyor.
+- Terminaller (`scripts/terminals.py`): yalnızca üst uçlar (`a`, `æ`, `ª`'nın kemeri) Sen gibi dik kesilir;
+  `e` Inter'in orijinal açılı ucuyla kalır (`CUT_TERMINALS`). Dik kesimde önce Sen'deki kadar kısa
+  kesim konumu bulunur (kesik ≤ 1.25 × Sen'in `c`/`e` kesiği); `TERMINAL_LENGTH` (Regular 0.5,
+  ExtraBold 0.25) kesimi bu konumdan Inter'in orijinal uç noktasına doğru kaydırır. İç kenar, dış
+  kenarın yönü ile kendi yönünün ortasına göre yeniden kurulur.
 - `æ` artık bileşik değil: Inter'in kendi `æ`'si a/e parametreleriyle uyarlanır (ExtraBold'da y
   ekstrapolasyonu 1.2 ile sınırlı, yoksa a ile e arasındaki boşluklar kapanıyor).
 - `ª`: Inter `º` → Sen `º` dönüşümü bulunur, aynısı Inter `ª`'ya uygulanır.
@@ -39,9 +41,10 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 
 ## Açık konular
 
-- **ExtraBold terminal iç kenarı**: `a` ve `e`'de dik kesiğin hemen içinde hafif düz bir bölge var; büyük boyutta göz ayarı gerekebilir.
+- **`e`'nin ağzı**: Sen'inkinden ~%25 kapalı (Regular 80 / 108, ExtraBold 47 / 66 birim). ExtraBold'da açılı
+  kesik orta çizgiye paralel uzandığı için büyük boyutta yarık gibi görünüyor.
 - **æ tepe birleşimi**: Inter'in tasarımından gelen küçük V çentiği ExtraBold'da belirgin.
 - **ExtraBold yatay kalınlık**: Sen'e eşitlemek için Inter Black'in ötesine ~%45 ekstrapolasyon gerekti (y ağırlığı ≈1122).
   `a`'nın alt iç boşluğu bu yüzden dar.
-- **Kerning gözden geçirme**: otomatik çiftler (`build/olcumler.json` → `kerning`; Regular 8, ExtraBold 13)
+- **Kerning gözden geçirme**: otomatik çiftler (`build/olcumler.json` → `kerning`)
   gerçek metinde kontrol edilmeli.
