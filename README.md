@@ -1,6 +1,6 @@
-# Deneme: Inter'den a, e, I, ı → Sen
+# Deneme: Inter'den a, e, I, ı ve çengel → Sen
 
-Inter 4.1'in `a`, `e`, `I` ve `ı` gliflerini Sen'in iki masterına (Regular 400, ExtraBold) uyarlama denemesi.
+Inter 4.1'in `a`, `e`, `I`, `ı` gliflerini ve çengelini (`Ç ç Ş ş Ţ ţ`) Sen'in iki masterına (Regular 400, ExtraBold) uyarlama denemesi.
 Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 
 ## Çalıştırma
@@ -44,6 +44,12 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
   `IJ` vb. bileşikler çapalara göre yeniden kurulur (aksanların dikey konumu Sen'deki gibi kalır).
 - `I`/`ı`/`i` içeren kerning çiftleri aynı profildeki harfin çiftine eşitlenir (`I` → `H`, sağda `ı`/`i` → `n`,
   solda → `l`); karşılığı yoksa silinir (`I C`, `I O`, ExtraBold `K i`). a/e kerning'i yeni `I`/`ı` ile ölçülür.
+- Çengel (`build_cedilla`): Sen'in `C S c s T t` harfleri aynen kalır, yalnızca ortak `cedillacomb`
+  Inter'in çengeliyle değişir. Inter'in şekli ve boyu (taban çizgisi altı 240 → 187 / 191), Sen'in kalınlığı
+  (boyun genişliği x ağırlığıyla, kase alt kalınlığı y ağırlığıyla Sen'in çengeline eşitlenir) ve Sen'in
+  bağlanma noktası (boyun ortası aynı `_bottom` çapasına). ExtraBold'da kase için Inter Black'in ötesine
+  y ≈ 2.1 ekstrapolasyon gerekiyor (`CEDILLA_TY_CAP` = 2.2). Inter'in Regular'ında boyunda bir köşe
+  noktası eksik; `_match_ops` doğruyu bölerek nokta yapısını Black'e eşitler.
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
 ## Açık konular

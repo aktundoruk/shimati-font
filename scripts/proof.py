@@ -21,6 +21,7 @@ SAMPLES = [
     ("ra fa va ka Pa Fa Va Ya av ay ex", 64),
     ("Değerlendirme yarın akşam", 56),
     ("Işık İzmir ılık IŞIK İNCİ HIH nın lil", 56),
+    ("Çiçek Şeker çay şiş ÇAĞ ŞİŞ", 56),
     ("ä â á à ã å ā ą æ é è ê ë ē ė ę ě œ", 44),
 ]
 PARAGRAPH = (
@@ -173,7 +174,7 @@ th,td{{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}} th{
 ul.notes li{{margin:6px 0;max-width:820px}}
 @media (max-width:640px){{.row{{grid-template-columns:1fr}}}}
 </style></head><body><main>
-<h1>Inter’den a, e, I, ı → Sen</h1>
+<h1>Inter’den a, e, I, ı ve çengel → Sen</h1>
 <p class="lede">Aynı metin üç fontla: Sen’in kendisi, Inter’in a, e, I ve ı’sının yalnızca ölçeklenip konmuş hâli
 ve Sen’in genişlik, kalınlık, overshoot ve boşluk sistemine göre uyarlanmış hâli. Ağırlığı kaydırıcıyla değiştirin.</p>
 <div class="controls"><label for="w">Ağırlık</label>

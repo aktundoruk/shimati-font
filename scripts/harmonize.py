@@ -46,6 +46,9 @@ CUT_TERMINALS = ("top",)
 AE_TY_CAP = 1.2
 # Boşluk düzeltmesi bu nötr harflere göre yapılır (kerning gerektirmeyen ortaklar).
 NEUTRAL_PARTNERS = ["n", "o", "i", "l", "H", "O"]
+# Inter'in çengel kasesi Regular→Black arasında az kalınlaşıyor; Sen'in ExtraBold çengeline yetişmek
+# için gereken y ekstrapolasyonu (~2.7) kaseyi kapatıyor, bu yüzden sınırlı.
+CEDILLA_TY_CAP = 2.2
 # Düz gövdeli harfler: (Inter karakteri, Sen'deki referans harf, yükseklik). Gövde kalınlığı ve
 # boşluklar referans harften alınır; Inter'deki glif/referans boşluk oranı korunur.
 STRAIGHT = {"I": ("I", "H", "capHeight"), "idotless": ("ı", "n", "xHeight")}
@@ -74,6 +77,28 @@ class SenGlyph:
         rec.replay(pen)
 
 
+def _match_ops(reg, black):
+    """Black'te fazladan bir köşe noktası varsa (ör. çengel boynu), Regular'daki doğru parçasını
+    aynı oranda bölerek nokta yapısını eşitler. Şekil değişmez: eklenen nokta doğrunun üstünde."""
+    i = 0
+    while len(reg) < len(black) and i < len(reg):
+        if reg[i][0] == black[i][0] == "lineTo" and reg[i + 1][0] == black[i + 1][0] == "lineTo" \
+                and len(reg) - i < len(black) - i and _is_extra(reg, black, i):
+            p0, p1 = reg[i - 1][1][-1], reg[i][1][-1]
+            b0, bm, b1 = black[i - 1][1][-1], black[i][1][-1], black[i + 1][1][-1]
+            span = (b1[1] - b0[1]) or 1
+            f = (bm[1] - b0[1]) / span
+            reg.insert(i, ("lineTo", ((p0[0] + f * (p1[0] - p0[0]), p0[1] + f * (p1[1] - p0[1])),)))
+        i += 1
+
+
+def _is_extra(reg, black, i):
+    """Black'in i. noktası, i-1 ile i+1 arasında Regular'da karşılığı olmayan ara köşe mi?"""
+    rest_r = [o for o, _ in reg[i:]]
+    rest_b = [o for o, _ in black[i + 1:]]
+    return rest_r == rest_b
+
+
 class InterGlyph:
     """Inter Regular ve Black arasında x ve y için ayrı ağırlıkla interpole edilen glif."""
 
@@ -88,6 +113,7 @@ class InterGlyph:
             font.getGlyphSet()[gname].draw(pen)
             self.ops[w] = pen.value
             self.adv[w] = font["hmtx"][gname][0]
+        _match_ops(self.ops["Regular"], self.ops["Black"])
         assert [o for o, _ in self.ops["Regular"]] == [o for o, _ in self.ops["Black"]]
 
     def at(self, tx, ty):
@@ -126,6 +152,18 @@ def ink(g):
 
 def _w(run):
     return run[1] - run[0]
+
+
+def solve_bracket(f, target, lo, hi):
+    """Artan f için [lo, hi] içinde f(t) = target (ikiye bölme); ulaşılamıyorsa uç değer."""
+    if f(hi) <= target:
+        return hi
+    if f(lo) >= target:
+        return lo
+    for _ in range(40):
+        m = (lo + hi) / 2
+        lo, hi = (m, hi) if f(m) < target else (lo, m)
+    return (lo + hi) / 2
 
 
 def solve(f, target, lo=0.0, hi=1.0):
@@ -229,6 +267,58 @@ def build_straight(sen, variant):
     return log
 
 
+def build_cedilla(sen, variant):
+    """Çengel: Inter'in daha kısa, kompakt çengel şekli; kalınlık ve bağlanma noktası Sen'den.
+
+    Ç ç Ş ş Ţ ţ, Sen'de C S c s T t + cedillacomb bileşiği. Yalnızca cedillacomb değişir; boynu
+    Sen'deki boynun yerine (aynı _bottom çapası) oturduğu için bileşikler olduğu gibi kalır.
+    Boyun genişliği (x ağırlığı) ve kase alt kalınlığı (y ağırlığı) Sen'in çengeline eşitlenir.
+    """
+    ig = InterGlyph("\u0327")
+    s = sen.info.xHeight / INTER_XH
+    old = SenGlyph(sen, "cedillacomb")
+    neck_y = -10
+    old_depth = ink(old)[1]
+
+    def neck(g):
+        return runs_at_y(contours_of(g), neck_y / s if g is not old else neck_y)[-1]
+
+    def bowl(g):
+        # kasenin alt kalınlığı, çengelin en alçak noktasının x'inde
+        P = contours_of(g)
+        ymin = min(p[1] for poly in P for p in poly)
+        xs = [p[0] for poly in P for p in poly if p[1] <= ymin + 1]
+        return _w(runs_at_x(P, sum(xs) / len(xs))[0])
+
+    if variant == "dogrudan":
+        t = solve(lambda t: stem_n(InterGlyph("n").at(t, t), INTER_XH) * s, stem_n(SenGlyph(sen, "n"), sen.info.xHeight))
+        tx = ty = t
+    else:
+        tx = solve(lambda t: _w(neck(ig.at(t, 0))) * s, _w(neck(old)))
+        ty = solve_bracket(lambda t: bowl(ig.at(tx, t)) * s, bowl(old), 0.0, CEDILLA_TY_CAP)
+    src = ig.at(tx, ty)
+    n_old, n_new = neck(old), neck(src)
+    old_bowl = bowl(old)
+    dx = (n_old[0] + n_old[1]) / 2 - (n_new[0] + n_new[1]) / 2 * s
+    final = transform(src, s, s, lambda y: y, dx)
+    g = sen["cedillacomb"]
+    write_outline(g, final)
+    # aralıklı cedilla (¸): Sen'deki sol/sağ boşluk korunur
+    sp = sen["cedilla"]
+    ox0, _, ox1, _ = ink(SenGlyph(sen, "cedilla"))
+    lsb, rsb = ox0, sp.width - ox1
+    nx0, _, nx1, _ = ink(final)
+    sp.components[0].transformation = (1, 0, 0, 1, round(lsb - nx0), 0)
+    sp.width = round(lsb + nx1 - nx0 + rsb)
+    for a in sp.anchors:
+        a.x = round(a.x + lsb - nx0)
+    P = contours_of(SenGlyph(sen, "cedillacomb"))
+    return {"inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
+            "scale": round(s, 4), "depth": [round(old_depth), round(ink(final)[1])],
+            "neck": [round(_w(n_old)), round(_w(runs_at_y(P, neck_y)[-1]))],
+            "bowl": [round(old_bowl), round(bowl(SenGlyph(sen, "cedillacomb")))]}
+
+
 def remap_straight_kerning(font):
     """I/ı/i içeren çiftleri, aynı profildeki harfin (H, n, l) çiftine eşitler; yoksa siler."""
     changes = []
@@ -254,6 +344,7 @@ def harmonize(variant):
         sen = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
         fonts[m] = sen
         straight_log = build_straight(sen, variant)
+        cedilla_log = build_cedilla(sen, variant)
         cuts = sen_cut_lengths(sen)
         params = {}
         xh = sen.info.xHeight
@@ -279,6 +370,7 @@ def harmonize(variant):
         }
         log[m] = {"xHeight": xh, "targets": {k: round(v, 1) if isinstance(v, float) else v for k, v in tgt.items() if k in ("stem", "oside", "otop", "etop")}}
         log[m]["straight"] = straight_log
+        log[m]["cedilla"] = cedilla_log
 
         for name in "ae":
             ig = inter[name]
@@ -379,6 +471,7 @@ def harmonize(variant):
             # a/e'nin boşluk ve kerning referansı: Sen'in eski a/e'si, ama yeni I/ı ile
             orig = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
             build_straight(orig, variant)
+            build_cedilla(orig, variant)
             log[m]["straight_kerning"] = remap_straight_kerning(sen)
             remap_straight_kerning(orig)
             log[m]["spacing"] = respace(orig, sen, ("a", "e", "ae"))
