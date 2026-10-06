@@ -21,6 +21,7 @@ from fontTools.ttLib import TTFont
 
 sys.path.insert(0, str(Path(__file__).parent))
 from geom import bounds, contours_of, runs_at_x, runs_at_y  # noqa: E402
+from kerning import adjust as adjust_kerning, optical_gap  # noqa: E402
 from terminals import (  # noqa: E402
     find_terminals, make_vertical, make_vertical_at, sen_cut_lengths, terminal_rel_x,
 )
@@ -34,6 +35,8 @@ TERMINAL_K_REGULAR = 1.25
 TERMINAL_K_EXTRABOLD = 1.0
 # æ iki bölmeli ve sıkışık; Black ötesine ekstrapolasyon a ile e arasındaki boşlukları kapatıyor.
 AE_TY_CAP = 1.2
+# Boşluk düzeltmesi bu nötr harflere göre yapılır (kerning gerektirmeyen ortaklar).
+NEUTRAL_PARTNERS = ["n", "o", "i", "l", "H", "O"]
 
 
 class OpsGlyph:
@@ -266,9 +269,38 @@ def harmonize(variant):
         if variant == "uyarlanmis":
             log[m]["ae"] = build_ae(sen, params, old["ae"], cuts, term_rel, m)
             log[m]["ordfeminine"] = build_ordfeminine(sen, cuts, term_rel, m)
+            orig = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
+            log[m]["spacing"] = respace(orig, sen, ("a", "e", "ae"))
         fix_composites(sen, old)
+        if variant == "uyarlanmis":
+            log[m]["kerning"] = adjust_kerning(orig, sen)
         sen.info.familyName = f"Sen Deneme {variant.capitalize()}"
     return fonts, log
+
+
+def respace(orig, font, glyphs, min_shift=5):
+    """Yeni glifin nötr harflerle optik boşluğunu, eski glifinkine eşitler (ortanca fark)."""
+    out = {}
+    for g in glyphs:
+        def median(vals):
+            vals = sorted(vals)
+            return vals[len(vals) // 2]
+        dl = median([optical_gap(orig, p, g, 0, {}) - optical_gap(font, p, g, 0, {}) for p in NEUTRAL_PARTNERS])
+        dr = median([optical_gap(orig, g, p, 0, {}) - optical_gap(font, g, p, 0, {}) for p in NEUTRAL_PARTNERS])
+        dl = round(dl) if abs(dl) >= min_shift else 0
+        dr = round(dr) if abs(dr) >= min_shift else 0
+        glyph = font[g]
+        if dl:
+            glyph.move((dl, 0))
+        glyph.width += dl + dr
+        out[g] = {"lsb": dl, "rsb": dr}
+    _clear_profile_cache()
+    return out
+
+
+def _clear_profile_cache():
+    import kerning
+    kerning._PROFILE_CACHE.clear()
 
 
 def apply_terminals(g, master, cuts, term_rel, scale=1.0):

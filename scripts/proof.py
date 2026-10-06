@@ -18,6 +18,7 @@ VARIANTS = [
 SAMPLES = [
     ("hamburgefonstiv", 96),
     ("aeaeae nanene ooaa", 72),
+    ("ra fa va ka Pa Fa Va Ya av ay ex", 64),
     ("Değerlendirme yarın akşam", 56),
     ("ä â á à ã å ā ą æ é è ê ë ē ė ę ě œ", 44),
 ]

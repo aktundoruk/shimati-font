@@ -29,6 +29,12 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 - `æ` artık bileşik değil: Inter'in kendi `æ`'si a/e parametreleriyle uyarlanır (ExtraBold'da y
   ekstrapolasyonu 1.2 ile sınırlı, yoksa a ile e arasındaki boşluklar kapanıyor).
 - `ª`: Inter `º` → Sen `º` dönüşümü bulunur, aynısı Inter `ª`'ya uygulanır.
+- Boşluk düzeltmesi (`respace`): a/e/æ'nin nötr harflerle (`n o i l H O`) optik boşluğu, Sen'in
+  eski a/e'sininkine eşitlenir (ortanca fark, ≥5 birimse).
+- Kerning (`scripts/kerning.py`): x-height bölgesinde derinliği kırpılmış ortalama boşluk eski
+  glifle eşitlenir. Sıkıştırma serbest; gevşetme yalnızca gerçek çarpışmada (en dar boşluk
+  eskisinin %60'ının altına inerse) ve onu giderecek kadar. Yeni çift yalnızca |değer| ≥ 30 ise eklenir.
+- PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
 ## Açık konular
 
@@ -36,4 +42,5 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 - **æ tepe birleşimi**: Inter'in tasarımından gelen küçük V çentiği ExtraBold'da belirgin.
 - **ExtraBold yatay kalınlık**: Sen'e eşitlemek için Inter Black'in ötesine ~%45 ekstrapolasyon gerekti (y ağırlığı ≈1122).
   `a`'nın alt iç boşluğu bu yüzden dar.
-- **Kerning**: `R a`, `v a`, `k e` gibi glife özel çiftler eski şekillere göre; gözden geçirilmeli.
+- **Kerning gözden geçirme**: otomatik çiftler (`build/olcumler.json` → `kerning`) mantıklı görünüyor ama
+  özellikle `F a` (−140) ve büyük harf + `e` çiftleri gerçek metinde kontrol edilmeli.

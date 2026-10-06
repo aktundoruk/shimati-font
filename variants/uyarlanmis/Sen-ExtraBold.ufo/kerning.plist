@@ -38,11 +38,15 @@
     <dict>
       <key>A</key>
       <integer>-70</integer>
+      <key>a</key>
+      <integer>-30</integer>
     </dict>
     <key>F</key>
     <dict>
       <key>A</key>
       <integer>-70</integer>
+      <key>ae</key>
+      <integer>-30</integer>
     </dict>
     <key>H</key>
     <dict>
@@ -54,7 +58,7 @@
       <key>Y</key>
       <integer>-30</integer>
       <key>a</key>
-      <integer>-40</integer>
+      <integer>-25</integer>
       <key>e</key>
       <integer>-40</integer>
       <key>i</key>
@@ -93,6 +97,10 @@
     <dict>
       <key>A</key>
       <integer>-70</integer>
+      <key>a</key>
+      <integer>-50</integer>
+      <key>ae</key>
+      <integer>-50</integer>
     </dict>
     <key>R</key>
     <dict>
@@ -133,7 +141,9 @@
       <key>O</key>
       <integer>-20</integer>
       <key>a</key>
-      <integer>-80</integer>
+      <integer>-115</integer>
+      <key>ae</key>
+      <integer>-30</integer>
     </dict>
     <key>W</key>
     <dict>
@@ -141,6 +151,8 @@
       <integer>-80</integer>
       <key>V</key>
       <integer>0</integer>
+      <key>a</key>
+      <integer>-30</integer>
     </dict>
     <key>X</key>
     <dict>
@@ -160,20 +172,40 @@
       <key>o</key>
       <integer>-75</integer>
     </dict>
+    <key>a</key>
+    <dict>
+      <key>V</key>
+      <integer>-30</integer>
+      <key>Y</key>
+      <integer>-45</integer>
+      <key>v</key>
+      <integer>-35</integer>
+      <key>y</key>
+      <integer>-35</integer>
+    </dict>
     <key>b</key>
     <dict>
       <key>t</key>
       <integer>-20</integer>
     </dict>
+    <key>e</key>
+    <dict>
+      <key>Z</key>
+      <integer>-30</integer>
+    </dict>
     <key>f</key>
     <dict>
+      <key>a</key>
+      <integer>-40</integer>
+      <key>ae</key>
+      <integer>-35</integer>
       <key>o</key>
       <integer>-10</integer>
     </dict>
     <key>k</key>
     <dict>
       <key>a</key>
-      <integer>-40</integer>
+      <integer>-20</integer>
       <key>c</key>
       <integer>-40</integer>
       <key>e</key>
@@ -207,7 +239,9 @@
     <key>r</key>
     <dict>
       <key>a</key>
-      <integer>0</integer>
+      <integer>-75</integer>
+      <key>ae</key>
+      <integer>-70</integer>
       <key>e</key>
       <integer>0</integer>
       <key>o</key>
@@ -240,7 +274,9 @@
     <key>v</key>
     <dict>
       <key>a</key>
-      <integer>-40</integer>
+      <integer>-75</integer>
+      <key>ae</key>
+      <integer>-30</integer>
       <key>c</key>
       <integer>-20</integer>
       <key>e</key>
@@ -251,7 +287,7 @@
     <key>w</key>
     <dict>
       <key>a</key>
-      <integer>-40</integer>
+      <integer>-70</integer>
       <key>o</key>
       <integer>-20</integer>
     </dict>
@@ -272,6 +308,10 @@
     </dict>
     <key>y</key>
     <dict>
+      <key>a</key>
+      <integer>-35</integer>
+      <key>ae</key>
+      <integer>-30</integer>
       <key>o</key>
       <integer>-20</integer>
     </dict>
