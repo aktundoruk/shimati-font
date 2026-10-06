@@ -1,0 +1,9 @@
+/* Shimati — değişken font (400–800). Bu dosyayı ve woff2'leri aynı klasöre koyun. */
+@font-face {
+  font-family: "Shimati";
+  src: url("Shimati-Variable.woff2") format("woff2-variations"),
+       url("Shimati-Variable.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}

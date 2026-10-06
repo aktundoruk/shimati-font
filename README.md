@@ -13,6 +13,29 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 .venv/bin/python scripts/render_png.py "metin 1" "metin 2"   # proof/karsilastirma.png
 ```
 
+## Shimati: dağıtım paketi ve tanıtım sayfası
+
+Fontun çalışma adı **Shimati** (sürüm 1.000, Made by Doruk Aktun).
+
+```bash
+.venv/bin/python scripts/harmonize.py      # kaynakları üret (yukarıdaki gibi)
+.venv/bin/python scripts/release.py        # dist/Shimati/ + dist/Shimati-1.000.zip
+.venv/bin/python scripts/specimen.py       # specimen/index.html (tanıtım sayfası, font gömülü)
+```
+
+- `release.py`: `variants/uyarlanmis` → `build/shimati-src` (ad, telif, tasarımcı, sürüm, `cv08` için
+  "Serifli I" etiketi, STAT etiketleri, Regular/Bold stil bağlantısı) → fontmake.
+  Çıktı: `desktop/` (değişken TTF, 5 ağırlık OTF ve TTF), `web/` (WOFF2 + `shimati.css`,
+  `shimati-static.css`), `OFL.txt`, `KURULUM.md`. Sabit dosyalar değişken fonttan en fazla 1 birim farklı.
+- OFL gereği font dosyalarının telif satırı (name ID 0) ve `OFL.txt` kaynak fontların telif satırlarını
+  taşır; ayrılmış font adı olmadığı için yeni ad serbest. Tanıtım sayfasında kaynak font adı geçmez
+  (`specimen.py` bunu denetler).
+- `specimen.py` + `specimen_template.html`: kahraman, karakter, deneme alanı, ağırlıklar, yapı çizimleri
+  (ölçü çizgileri, noktalar, tutamaçlar, gövde/taşma/çengel ölçüleri, iki master arasında interpole eden
+  ağırlık kaydırıcısı), ağırlık ekseni çizimi, ölçü tablosu, glif inceleyici, Türkçe, ölçek, arayüz,
+  OpenType (cv08, frac, sups), indirme. Açık/koyu tema; mobilde yatay taşma yok.
+- Proje hafızasının yedeği: `docs/hafiza/`.
+
 ## Yöntem (uyarlanmış varyant)
 
 - Inter Regular→Black aralığı nokta nokta doğrusal (sapma < 2/2048), bu yüzden x ve y koordinatları

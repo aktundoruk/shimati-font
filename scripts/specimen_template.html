@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shimati</title>
+<meta name="description" content="Shimati: arayüzler ve uzun metinler için değişken ağırlıklı, Türkçeye özenle çizilmiş bir grotesk. Made by Doruk Aktun.">
+<style>
+@font-face{font-family:"Shimati";src:url(data:font/woff2;base64,%%FONT%%) format("woff2");font-weight:400 800;font-style:normal;font-display:block}
+
+:root{
+  --bg:#f2efe8;--bg-2:#e9e5db;--card:#faf8f3;--fg:#151411;--fg-2:#3c3a34;--muted:#77736a;--line:#d9d4c7;--line-2:#c8c2b3;
+  --accent:#b9532c;--accent-2:#e2b9a3;--accent-soft:rgba(185,83,44,.10);
+  --glyph-fill:rgba(21,20,17,.075);--node:#151411;--node-fill:#faf8f3;--handle:#9c978b;--metric:#b9532c;
+  --maxw:1240px;--pad:clamp(16px,4vw,40px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f0f0d;--bg-2:#171714;--card:#151513;--fg:#efece4;--fg-2:#cfcbc1;--muted:#8f8b81;--line:#2a2925;--line-2:#3a3833;
+  --accent:#ee8256;--accent-2:#6b3a26;--accent-soft:rgba(238,130,86,.12);
+  --glyph-fill:rgba(239,236,228,.08);--node:#efece4;--node-fill:#0f0f0d;--handle:#6d6a62;--metric:#ee8256}}
+:root[data-theme="dark"]{
+  --bg:#0f0f0d;--bg-2:#171714;--card:#151513;--fg:#efece4;--fg-2:#cfcbc1;--muted:#8f8b81;--line:#2a2925;--line-2:#3a3833;
+  --accent:#ee8256;--accent-2:#6b3a26;--accent-soft:rgba(238,130,86,.12);
+  --glyph-fill:rgba(239,236,228,.08);--node:#efece4;--node-fill:#0f0f0d;--handle:#6d6a62;--metric:#ee8256}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Shimati",system-ui,sans-serif;font-weight:400;
+  line-height:1.5;font-size:17px;transition:background .3s,color .3s;overflow-x:hidden}
+a{color:inherit}
+::selection{background:var(--accent);color:var(--bg)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+.label{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}
+button,input,select{font:inherit;color:inherit}
+
+/* Üst çubuk */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:24px;height:60px}
+.logo{font-weight:800;font-size:21px;letter-spacing:-.02em;text-decoration:none}
+.nav{display:flex;gap:22px;margin-left:auto;font-size:14px}
+.nav a{text-decoration:none;color:var(--fg-2)}
+.nav a:hover{color:var(--accent)}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:transparent;cursor:pointer;
+  display:grid;place-items:center;color:var(--fg)}
+.icon-btn:hover{border-color:var(--fg)}
+.icon-btn svg{width:18px;height:18px}
+.theme-sun{display:none}
+:root[data-theme="dark"] .theme-sun{display:block}:root[data-theme="dark"] .theme-moon{display:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme-sun{display:block}:root:not([data-theme="light"]) .theme-moon{display:none}}
+@media (max-width:860px){.nav{display:none}.bar .theme{margin-left:auto}}
+
+/* Kahraman */
+.hero{padding-top:clamp(48px,9vw,120px)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:clamp(8px,2vw,24px)}
+.hero h1{margin:0;font-size:clamp(84px,22vw,300px);line-height:.86;letter-spacing:-.045em;font-weight:400;
+  animation:breathe 9s ease-in-out infinite;white-space:nowrap}
+@keyframes breathe{0%,100%{font-weight:400}50%{font-weight:800}}
+@media (prefers-reduced-motion:reduce){.hero h1{animation:none;font-weight:800}}
+.hero-row{display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:end;margin-top:clamp(28px,4vw,48px);
+  padding-bottom:clamp(40px,6vw,72px);border-bottom:1px solid var(--line)}
+.lede{font-size:clamp(20px,2.3vw,28px);line-height:1.32;letter-spacing:-.01em;margin:0;max-width:30ch}
+.cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 22px;border-radius:999px;text-decoration:none;
+  font-weight:600;font-size:15px;border:1px solid var(--fg);cursor:pointer;background:transparent}
+.btn.primary{background:var(--fg);color:var(--bg)}
+.btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn svg{width:16px;height:16px}
+@media (max-width:760px){.hero-row{grid-template-columns:1fr}.cta{justify-content:flex-start}}
+
+.strip{display:grid;grid-template-columns:repeat(6,1fr);border-bottom:1px solid var(--line)}
+.strip div{aspect-ratio:1/1;display:grid;place-items:center;font-size:clamp(40px,7vw,96px);border-right:1px solid var(--line);
+  letter-spacing:-.02em;transition:font-weight .4s}
+.strip div:last-child{border-right:0}
+.strip div:hover{font-weight:800;color:var(--accent)}
+@media (max-width:640px){.strip{grid-template-columns:repeat(3,1fr)}.strip div:nth-child(3){border-right:0}
+  .strip div:nth-child(-n+3){border-bottom:1px solid var(--line)}}
+
+/* Bölümler */
+section{padding:clamp(64px,9vw,120px) 0 0}
+.sec-head{display:grid;grid-template-columns:200px 1fr;gap:24px;margin-bottom:clamp(28px,4vw,48px)}
+.sec-head h2{margin:0;font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.035em;font-weight:700}
+.sec-head p{margin:14px 0 0;max-width:62ch;color:var(--fg-2);font-size:18px}
+.num{padding-top:10px}
+@media (max-width:760px){.sec-head{grid-template-columns:1fr;gap:6px}}
+
+.statement{font-size:clamp(28px,4.4vw,58px);line-height:1.08;letter-spacing:-.03em;margin:0 0 clamp(36px,5vw,64px);max-width:22ch;font-weight:500}
+.statement em{font-style:normal;color:var(--accent)}
+.traits{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.trait{padding:24px 24px 8px 0}
+.trait + .trait{padding-left:24px;border-left:1px solid var(--line)}
+.trait b{display:block;font-size:20px;font-weight:700;margin:14px 0 8px;letter-spacing:-.01em}
+.trait p{margin:0;color:var(--fg-2);font-size:15.5px}
+.trait .big{font-size:56px;line-height:1;font-weight:500;letter-spacing:-.03em}
+@media (max-width:960px){.traits{grid-template-columns:1fr 1fr}.trait:nth-child(3){padding-left:0;border-left:0}
+  .trait:nth-child(n+3){border-top:1px solid var(--line)}}
+@media (max-width:560px){.traits{grid-template-columns:1fr}.trait + .trait{padding-left:0;border-left:0;border-top:1px solid var(--line)}}
+
+/* Deneme alanı */
+.tester{border:1px solid var(--line);border-radius:20px;background:var(--card);overflow:hidden}
+.controls{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line)}
+.ctl{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
+.ctl output{min-width:34px;color:var(--fg);font-variant-numeric:tabular-nums;font-weight:600}
+input[type=range]{-webkit-appearance:none;appearance:none;width:150px;height:22px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line-2);border-radius:2px}
+input[type=range]::-moz-range-track{height:2px;background:var(--line-2)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--fg);margin-top:-7px;border:0}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--fg);border:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line-2);background:transparent;border-radius:999px;padding:6px 13px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip:hover{border-color:var(--fg)}
+.tester-text{padding:clamp(20px,4vw,44px);min-height:260px;outline:none;font-size:72px;line-height:1.08;letter-spacing:-.02em;
+  overflow-wrap:anywhere}
+.tester-text:focus{background:var(--accent-soft)}
+
+/* Ağırlıklar */
+.weights{border-top:1px solid var(--line)}
+.wrow{display:grid;grid-template-columns:200px 1fr;align-items:baseline;gap:24px;padding:22px 0;border-bottom:1px solid var(--line)}
+.wrow .s{font-size:clamp(34px,6vw,76px);line-height:1.05;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wrow .meta b{display:block;font-size:17px}
+@media (max-width:760px){.wrow{grid-template-columns:1fr;gap:4px}}
+
+/* Yapı çizimleri */
+.figure{border:1px solid var(--line);border-radius:20px;background:var(--card);overflow:hidden}
+.fig-tools{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line)}
+.fig-tools .legend{display:flex;gap:16px;margin-left:auto;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:9px;height:9px;border:1.5px solid var(--node);background:var(--node-fill)}
+.legend i.c{border-radius:50%}.legend i.o{border-radius:50%;width:7px;height:7px;border-color:var(--handle)}
+.legend i.m{width:16px;height:0;border:0;border-top:1.5px dashed var(--metric)}
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.word-svg{display:block;width:100%;min-width:760px;height:auto}
+svg text{font-family:"Shimati",system-ui,sans-serif}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.card{border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}
+.card svg{display:block;width:100%;height:auto}
+.card .cap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 18px;border-top:1px solid var(--line);font-size:13px}
+.card .cap b{font-size:15px}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.cards{grid-template-columns:1fr}}
+[data-fill="0"] .l-fill,[data-nodes="0"] .l-nodes,[data-handles="0"] .l-handles,[data-metrics="0"] .l-metrics{display:none}
+
+.axis-wrap{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-top:16px}
+.axis-wrap .figure svg{display:block;width:100%;height:auto}
+.specs{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:8px 22px}
+.specs table{width:100%;border-collapse:collapse;font-size:14.5px;font-variant-numeric:tabular-nums}
+.specs th{text-align:left;font-weight:400;color:var(--muted);padding:11px 0}
+.specs td{text-align:right;padding:11px 0 11px 12px;font-weight:600}
+.specs tr + tr{border-top:1px solid var(--line)}
+.specs thead th{font-size:12px;letter-spacing:.09em;text-transform:uppercase;font-weight:600}
+.specs thead th:not(:first-child){text-align:right}
+@media (max-width:900px){.axis-wrap{grid-template-columns:1fr}}
+
+/* Glifler */
+.inspector{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.insp-info{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:24px;display:flex;flex-direction:column}
+.insp-char{font-size:clamp(120px,16vw,220px);line-height:1;letter-spacing:0;margin:8px 0 18px}
+.insp-info dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:auto 0 0;font-size:14px;font-variant-numeric:tabular-nums}
+.insp-info dt{color:var(--muted)}.insp-info dd{margin:0;text-align:right;font-weight:600}
+.insp-svg{display:block;width:100%;height:auto}
+@media (max-width:860px){.inspector{grid-template-columns:1fr}}
+.grid-group{margin-top:36px}
+.grid-group h3{margin:0 0 12px;font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.gl button{aspect-ratio:1/1;border:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:transparent;
+  font-size:30px;cursor:pointer;display:grid;place-items:center;padding:0;transition:background .15s}
+.gl button:hover{background:var(--accent-soft)}
+.gl button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+
+/* Türkçe */
+.tr-letters{display:grid;grid-template-columns:repeat(6,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.tr-letters div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 18px 14px;display:flex;flex-direction:column;
+  justify-content:space-between;aspect-ratio:1/1.08}
+.tr-letters div{min-width:0}
+.tr-letters span{font-size:clamp(38px,9vw,128px);line-height:1;letter-spacing:-.03em}
+.tr-letters small{color:var(--muted);font-size:12.5px}
+@media (max-width:760px){.tr-letters{grid-template-columns:repeat(3,1fr)}.tr-letters div{padding:12px 10px 10px}.tr-letters small{font-size:11px}}
+.tr-text{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,72px);margin-top:clamp(36px,5vw,56px)}
+.tr-text h3{font-size:clamp(30px,4vw,48px);line-height:1.05;letter-spacing:-.03em;margin:0 0 18px;font-weight:700}
+.tr-text p{margin:0 0 14px;font-size:18px;color:var(--fg-2)}
+.tr-words{font-size:clamp(26px,3.4vw,40px);line-height:1.25;letter-spacing:-.02em;font-weight:500}
+@media (max-width:760px){.tr-text{grid-template-columns:1fr}}
+
+/* Ölçek */
+.scale-row{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:baseline;padding:18px 0;border-bottom:1px solid var(--line)}
+.scale-row:first-child{border-top:1px solid var(--line)}
+.scale-row .t{margin:0;overflow-wrap:anywhere}
+@media (max-width:760px){.scale-row{grid-template-columns:1fr;gap:6px}}
+
+/* Arayüz */
+.ui{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:16px}
+.panel{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:22px}
+.panel h4{margin:0 0 4px;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.price{font-size:46px;font-weight:700;letter-spacing:-.03em;margin:14px 0 2px;font-variant-numeric:tabular-nums}
+.ui-btns{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.ui-btn{padding:11px 18px;border-radius:12px;border:1px solid var(--line-2);font-weight:600;font-size:14.5px;background:transparent}
+.ui-btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.field{display:block;margin-top:14px}
+.field span{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.field div{border:1px solid var(--line-2);border-radius:12px;padding:11px 14px;font-size:15px}
+.tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin:4px 0 14px;font-size:14.5px}
+.tabs span{padding:8px 0;color:var(--muted)}.tabs span.on{color:var(--fg);font-weight:600;border-bottom:2px solid var(--fg);margin-bottom:-1px}
+.tx{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px;font-variant-numeric:tabular-nums}
+.tx:last-child{border-bottom:0}.tx b{font-weight:600}.tx .neg{color:var(--accent)}
+.toast{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:14px;background:var(--accent-soft);margin-top:14px;font-size:14px}
+.toast b{display:block}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px;flex:none}
+@media (max-width:960px){.ui{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.ui{grid-template-columns:1fr}}
+
+/* OpenType */
+.ot{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ot .panel{display:flex;flex-direction:column;gap:10px}
+.ot .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.ot .pair div{border:1px solid var(--line);border-radius:14px;padding:16px 10px 10px;text-align:center}
+.ot .pair > div{min-width:0}
+.ot .pair > div > span{display:block;font-size:clamp(30px,8vw,46px);line-height:1.1;letter-spacing:-.01em}
+.ot .pair small{color:var(--muted);font-size:12px}
+.ot code{font-size:12.5px}
+.cv08{font-feature-settings:"cv08" 1}.frac{font-feature-settings:"frac" 1}.sups{font-feature-settings:"sups" 1}
+@media (max-width:900px){.ot{grid-template-columns:1fr}}
+.figures{font-size:clamp(44px,8vw,112px);letter-spacing:-.02em;line-height:1.05;margin:clamp(28px,4vw,48px) 0 0;overflow-wrap:anywhere}
+
+/* İndir */
+.dl{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.dl .panel{display:flex;flex-direction:column;gap:10px}
+.dl ul{margin:0;padding:0;list-style:none;font-size:14.5px}
+.dl li{padding:9px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
+.dl li:last-child{border-bottom:0}
+.dl li a{text-decoration:none}.dl li a:hover{color:var(--accent)}
+pre{margin:0;padding:16px;border-radius:14px;background:var(--bg-2);overflow-x:auto;font-size:12.5px;line-height:1.55}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.steps{margin:0;padding-left:18px;font-size:14.5px;color:var(--fg-2)}
+.steps li{margin:6px 0}
+.dl-cta{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-top:16px;padding:28px;border-radius:20px;
+  background:var(--fg);color:var(--bg)}
+.dl-cta b{font-size:clamp(24px,3vw,36px);letter-spacing:-.02em;font-weight:700}
+.dl-cta .btn{border-color:var(--bg);color:var(--bg)}
+.dl-cta .btn.primary{background:var(--bg);color:var(--fg)}
+@media (max-width:960px){.dl{grid-template-columns:1fr}}
+
+.ui > *,.ot > *,.dl > *,.cards > *,.axis-wrap > *,.inspector > *,.tr-text > *,.traits > *{min-width:0}
+footer{margin-top:clamp(80px,10vw,140px);border-top:1px solid var(--line);padding:36px 0 48px}
+footer .wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.sign{font-size:clamp(30px,5vw,60px);letter-spacing:-.03em;font-weight:700;line-height:1}
+.sign span{color:var(--accent)}
+</style>
+<script>
+try{const t=localStorage.getItem("shimati-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+</script>
+</head>
+<body>
+
+<header class="bar"><div class="wrap">
+  <a class="logo" href="#top">Shimati</a>
+  <nav class="nav">
+    <a href="#karakter">Karakter</a><a href="#dene">Dene</a><a href="#yapi">Yapı</a><a href="#glifler">Glifler</a>
+    <a href="#turkce">Türkçe</a><a href="#arayuz">Arayüz</a><a href="#indir">İndir</a>
+  </nav>
+  <button class="icon-btn theme" id="theme" aria-label="Açık / koyu tema">
+    <svg class="theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+    <svg class="theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</div></header>
+
+<main id="top">
+<div class="wrap hero">
+  <div class="hero-meta label"><span>Yazı karakteri</span><span>Sürüm %%VERSION%%</span><span>Ağırlık 400–800</span><span>%%CHARS%% karakter</span></div>
+  <h1>Shimati</h1>
+  <div class="hero-row">
+    <p class="lede">Arayüzler, ürünler ve uzun metinler için sakin, net ve ekonomik bir grotesk. Tek değişken dosyada beş ağırlık; Türkçenin her harfi özenle çizildi.</p>
+    <div class="cta">
+      <a class="btn primary" href="../dist/Shimati-%%VERSION%%.zip" download>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v9M4 7.5 8 11.5l4-4M2.5 14h11"/></svg>Fontu indir</a>
+      <a class="btn" href="#dene">Yazıyı dene</a>
+    </div>
+  </div>
+</div>
+<div class="wrap"><div class="strip"><div>Aa</div><div>Ğğ</div><div>Şş</div><div>İı</div><div>Jj</div><div>₺</div></div></div>
+
+<section id="karakter"><div class="wrap">
+  <div class="sec-head"><div class="label num">01 · Karakter</div><div><h2>Az söyler, çok taşır.</h2></div></div>
+  <p class="statement">Geometrinin disiplinini insan elinin sıcaklığıyla buluşturan, <em>her gün binlerce kez</em> okunmak için tasarlanmış harfler.</p>
+  <div class="traits">
+    <div class="trait"><div class="big">%8</div><b>Dar ve ekonomik</b><p>Harfler gövde kalınlığından ödün vermeden daraltıldı. Aynı satıra daha çok söz sığar, sayfa yine ferah kalır.</p></div>
+    <div class="trait"><div class="big">ğ ş ı</div><b>Türkçe için çizildi</b><p>Kısa ve zarif çengeller, narin kısa şapka, küçük ve yuvarlak noktalar. Türkçe metin satırın altına taşmadan akar.</p></div>
+    <div class="trait"><div class="big">400 800</div><b>Değişken eksen</b><p>Tek dosyada kesintisiz ağırlık. Regular, Medium, SemiBold, Bold ve ExtraBold her platformda adlarıyla hazır.</p></div>
+    <div class="trait"><div class="big">I l 1</div><b>Ekranda net</b><p>Düz çubuk I, sıkı ve ritmik aralık, harf çiftlerine göre ayarlanmış kerning. İstenirse serifli I seçeneği.</p></div>
+  </div>
+</div></section>
+
+<section id="dene"><div class="wrap">
+  <div class="sec-head"><div class="label num">02 · Dene</div><div><h2>Kendi metninle dene.</h2><p>Aşağıdaki alana tıklayıp yazabilirsin. Ağırlık ekseni 400 ile 800 arasında kesintisiz çalışır.</p></div></div>
+  <div class="tester">
+    <div class="controls">
+      <label class="ctl">Ağırlık <input type="range" id="t-w" min="400" max="800" value="560"><output id="t-wo">560</output></label>
+      <label class="ctl">Boyut <input type="range" id="t-s" min="14" max="200" value="72"><output id="t-so">72</output></label>
+      <div class="chips" id="t-presets">
+        <button class="chip" aria-pressed="true" data-k="0">Başlık</button>
+        <button class="chip" aria-pressed="false" data-k="1">Pangram</button>
+        <button class="chip" aria-pressed="false" data-k="2">Paragraf</button>
+        <button class="chip" aria-pressed="false" data-k="3">Rakamlar</button>
+      </div>
+      <button class="chip" id="t-cv" aria-pressed="false">Serifli I</button>
+    </div>
+    <div class="tester-text" id="t-text" contenteditable="true" spellcheck="false">Işık, gölge ve biraz cesaret.</div>
+  </div>
+</div></section>
+
+<section id="agirliklar"><div class="wrap">
+  <div class="sec-head"><div class="label num">03 · Ağırlıklar</div><div><h2>Beş ağırlık, tek ses.</h2><p>Adlandırılmış ağırlıklar sabit dosya olarak da gelir. Değişken dosya aradaki her değeri verir.</p></div></div>
+  <div class="weights" id="weights"></div>
+</div></section>
+
+<section id="yapi"><div class="wrap">
+  <div class="sec-head"><div class="label num">04 · Yapı</div><div><h2>Çizginin arkasındaki geometri.</h2>
+    <p>Her harf aynı ölçü sisteminden doğar: ortak yükseklikler, eşit gövde kalınlıkları ve yuvarlak formların taşma payı. Kaydırıcı, iki ana çizim arasındaki ağırlık eksenini nokta nokta gezer.</p></div></div>
+  <div class="figure" id="word-fig" data-fill="1" data-nodes="1" data-handles="1" data-metrics="1">
+    <div class="fig-tools">
+      <label class="ctl">Ağırlık <input type="range" class="w-shared" min="400" max="800" value="400"><output class="w-out">400</output></label>
+      <div class="chips" data-toggles="word-fig">
+        <button class="chip" aria-pressed="true" data-t="fill">Dolgu</button>
+        <button class="chip" aria-pressed="true" data-t="nodes">Noktalar</button>
+        <button class="chip" aria-pressed="true" data-t="handles">Tutamaçlar</button>
+        <button class="chip" aria-pressed="true" data-t="metrics">Ölçüler</button>
+      </div>
+      <div class="legend"><span><i></i>Köşe noktası</span><span><i class="c"></i>Eğri noktası</span><span><i class="o"></i>Kontrol noktası</span><span><i class="m"></i>Ölçü çizgisi</span></div>
+    </div>
+    <div class="scroll-x"><svg class="word-svg" id="word-svg" role="img" aria-label="Shimati sözcüğünün nokta ve ölçü çizgileriyle çizimi"></svg></div>
+  </div>
+  <div class="cards" id="cards" data-fill="1" data-nodes="1" data-handles="1" data-metrics="1"></div>
+  <div class="axis-wrap">
+    <div class="figure">
+      <div class="fig-tools"><span class="label">Ağırlık ekseni</span>
+        <div class="legend"><span><i class="m" style="border-top-style:solid;border-color:var(--handle)"></i>400</span><span><i class="m" style="border-top-style:solid;border-color:var(--fg)"></i>800</span><span><i class="m" style="border-top-style:solid"></i>Nokta yolu</span></div></div>
+      <svg id="axis-svg" role="img" aria-label="En ince ve en kalın ağırlığın üst üste çizimi"></svg>
+    </div>
+    <div class="specs"><table id="specs"><thead><tr><th>Ölçü</th><th>400</th><th>800</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div></section>
+
+<section id="glifler"><div class="wrap">
+  <div class="sec-head"><div class="label num">05 · Glifler</div><div><h2>%%CHARS%% karakter, %%GLYPHS%% glif.</h2><p>Bir karaktere dokun; çizimi, noktaları ve boşluklarıyla birlikte açılsın.</p></div></div>
+  <div class="inspector">
+    <div class="figure" id="insp-fig" data-fill="1" data-nodes="1" data-handles="1" data-metrics="1">
+      <div class="fig-tools">
+        <label class="ctl">Ağırlık <input type="range" class="w-shared" min="400" max="800" value="400"><output class="w-out">400</output></label>
+        <div class="chips" data-toggles="insp-fig">
+          <button class="chip" aria-pressed="true" data-t="fill">Dolgu</button>
+          <button class="chip" aria-pressed="true" data-t="nodes">Noktalar</button>
+          <button class="chip" aria-pressed="true" data-t="handles">Tutamaçlar</button>
+        </div>
+      </div>
+      <svg class="insp-svg" id="insp-svg" role="img" aria-label="Seçili glifin çizimi"></svg>
+    </div>
+    <div class="insp-info">
+      <div class="label" id="insp-group">Küçük harf</div>
+      <div class="insp-char" id="insp-char">ğ</div>
+      <dl>
+        <dt>Kod</dt><dd id="i-u"></dd>
+        <dt>Glif adı</dt><dd id="i-n"></dd>
+        <dt>Genişlik</dt><dd id="i-w"></dd>
+        <dt>Sol / sağ boşluk</dt><dd id="i-sb"></dd>
+        <dt>Kontur / nokta</dt><dd id="i-p"></dd>
+      </dl>
+    </div>
+  </div>
+  <div id="glyph-grid"></div>
+</div></section>
+
+<section id="turkce"><div class="wrap">
+  <div class="sec-head"><div class="label num">06 · Türkçe</div><div><h2>Noktası, şapkası, çengeli yerinde.</h2>
+    <p>Türkçenin altı özel harf çifti ayrı ayrı ele alındı: aksanlar harfin ağırlığıyla birlikte incelir ve kalınlaşır, satır aralığını zorlamaz.</p></div></div>
+  <div class="tr-letters">
+    <div><span>Ğğ</span><small>Narin kısa şapka</small></div>
+    <div><span>Şş</span><small>Kısa çengel</small></div>
+    <div><span>Çç</span><small>Kısa çengel</small></div>
+    <div><span>İı</span><small>Yuvarlak nokta, düz gövde</small></div>
+    <div><span>Öö</span><small>Dengeli iki nokta</small></div>
+    <div><span>Üü</span><small>Dengeli iki nokta</small></div>
+  </div>
+  <div class="tr-text">
+    <div>
+      <h3>Öğleden sonra İstanbul’da ılık bir rüzgâr esiyordu.</h3>
+      <p>Çağla ile Işıl, Üsküdar iskelesinde çaylarını içip şehrin ışıklarını izlediler. Saat 18.45’te vapur kalktığında, 2.350 ₺’lik hesabın 1.175 ₺’sini çoktan ödemişlerdi.</p>
+      <p>İyi bir yazı karakteri okuru yormadan geri çekilmeyi bilir. Harflerin tek tek ne kadar güzel olduğundan çok, birbirleriyle nasıl anlaştıkları önemlidir.</p>
+    </div>
+    <div class="tr-words">Pijamalı hasta yağız şoföre çabucak güvendi. Işıklı, İğdır, çığ, Şişli, gümüş, ağaç, düğüm, ılgın, Kağızman, Çeşme.</div>
+  </div>
+</div></section>
+
+<section id="olcek"><div class="wrap">
+  <div class="sec-head"><div class="label num">07 · Ölçek</div><div><h2>Başlıktan dipnota.</h2><p>Bir tasarım sistemi için önerilen yazı ölçeği. Büyük boyutlarda aralık sıkılaşır, küçük boyutlarda açılır.</p></div></div>
+  <div id="scale"></div>
+</div></section>
+
+<section id="arayuz"><div class="wrap">
+  <div class="sec-head"><div class="label num">08 · Arayüz</div><div><h2>Ekranda, her gün.</h2><p>Düğmeler, formlar, tablolar ve bildirimler: küçük boyutlarda da açık ve ayırt edilebilir.</p></div></div>
+  <div class="ui">
+    <div class="panel">
+      <div class="label">Abonelik</div>
+      <h4>Profesyonel</h4>
+      <div class="muted" style="font-size:14.5px">Ekipler için sınırsız proje ve öncelikli destek.</div>
+      <div class="price">249,90 ₺</div>
+      <div class="muted" style="font-size:13px">aylık, KDV dahil</div>
+      <div class="ui-btns"><span class="ui-btn p">Hemen başla</span><span class="ui-btn">Ayrıntılar</span></div>
+      <div class="toast"><span class="dot"></span><div><b>Ödeme alındı</b>İşleminiz 06.10.2026 tarihinde onaylandı.</div></div>
+    </div>
+    <div class="panel">
+      <div class="tabs"><span class="on">Hesap</span><span>Güvenlik</span><span>Bildirimler</span></div>
+      <label class="field"><span>Ad soyad</span><div>Işıl Çağlayan</div></label>
+      <label class="field"><span>E-posta</span><div>isil@ornek.com.tr</div></label>
+      <label class="field"><span>Şehir</span><div>İzmir, Türkiye</div></label>
+      <div class="ui-btns"><span class="ui-btn p">Kaydet</span><span class="ui-btn">Vazgeç</span></div>
+    </div>
+    <div class="panel">
+      <div class="label">Son işlemler</div>
+      <h4 style="margin:6px 0 10px">Ekim 2026</h4>
+      <div class="tx"><span>Köşe kahvecisi</span><b class="neg">−86,50 ₺</b></div>
+      <div class="tx"><span>Maaş ödemesi</span><b>+42.750,00 ₺</b></div>
+      <div class="tx"><span>İSKİ fatura</span><b class="neg">−312,40 ₺</b></div>
+      <div class="tx"><span>Şirket iadesi</span><b>+1.180,00 ₺</b></div>
+      <div class="tx"><span>Gıda alışverişi</span><b class="neg">−1.947,15 ₺</b></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="ozellikler"><div class="wrap">
+  <div class="sec-head"><div class="label num">09 · Özellikler</div><div><h2>Rakamlar ve OpenType.</h2><p>Rakamlar eşit genişliktedir; tablolarda sütunlar kaymaz. ₺ de aynı genişlikte çizildi.</p></div></div>
+  <div class="ot">
+    <div class="panel"><div class="label">cv08 · Serifli I</div><div>I, l ve 1'in karışabileceği yerler için.</div>
+      <div class="pair"><div><span>Il1İ</span><small>Varsayılan</small></div><div><span class="cv08">Il1İ</span><small>cv08</small></div></div>
+      <code>font-feature-settings: "cv08";</code></div>
+    <div class="panel"><div class="label">frac · Kesirler</div><div>Bölü işaretli sayılar kesire dönüşür.</div>
+      <div class="pair"><div><span>1/2 3/4</span><small>Varsayılan</small></div><div><span class="frac">1/2 3/4</span><small>frac</small></div></div>
+      <code>font-feature-settings: "frac";</code></div>
+    <div class="panel"><div class="label">sups · Üst simge</div><div>Dipnot ve üs rakamları için.</div>
+      <div class="pair"><div><span>m2 x3</span><small>Varsayılan</small></div><div><span>m<span class="sups">2</span> x<span class="sups">3</span></span><small>sups</small></div></div>
+      <code>font-feature-settings: "sups";</code></div>
+  </div>
+  <div class="figures">0123456789<br>₺ € $ £ % & @ ¶ § ©</div>
+</div></section>
+
+<section id="indir"><div class="wrap">
+  <div class="sec-head"><div class="label num">10 · İndir</div><div><h2>Bilgisayara ve web'e.</h2><p>Paket masaüstü ve web dosyalarını, kurulum notlarını ve lisans metnini içerir. SIL Open Font License 1.1 ile özgürce kullanılabilir, değiştirilebilir ve paylaşılabilir.</p></div></div>
+  <div class="dl">
+    <div class="panel"><div class="label">Masaüstü</div><h4>OTF · TTF · Değişken</h4>
+      <ul>
+        <li><a href="../dist/Shimati/desktop/Shimati-Variable.ttf" download>Shimati-Variable.ttf</a><span class="muted">400–800</span></li>
+        <li><a href="../dist/Shimati/desktop/otf/">otf/</a><span class="muted">5 ağırlık</span></li>
+        <li><a href="../dist/Shimati/desktop/ttf/">ttf/</a><span class="muted">5 ağırlık</span></li>
+      </ul>
+      <ol class="steps"><li><b>macOS:</b> dosyaya çift tıkla, Font Book'ta Yükle.</li><li><b>Windows:</b> sağ tıkla, Yükle.</li><li>Değişken ve sabit dosyaları aynı anda kurma.</li></ol>
+    </div>
+    <div class="panel"><div class="label">Web</div><h4>WOFF2 · CSS</h4>
+      <ul>
+        <li><a href="../dist/Shimati/web/Shimati-Variable.woff2" download>Shimati-Variable.woff2</a><span class="muted">tek dosya</span></li>
+        <li><a href="../dist/Shimati/web/shimati.css">shimati.css</a><span class="muted">@font-face</span></li>
+        <li><a href="../dist/Shimati/web/shimati-static.css">shimati-static.css</a><span class="muted">sabit</span></li>
+      </ul>
+<pre><code>&lt;link rel="stylesheet" href="/fonts/shimati/shimati.css"&gt;
+
+body { font-family: "Shimati", system-ui, sans-serif; }
+h1   { font-weight: 800; }</code></pre>
+    </div>
+    <div class="panel"><div class="label">Lisans</div><h4>SIL OFL 1.1</h4>
+      <ol class="steps">
+        <li>Kişisel ve ticari projelerde ücretsiz kullan.</li>
+        <li>Web sitelerine, uygulamalara, belgelere göm.</li>
+        <li>Değiştir ve dağıt; türevler aynı lisansla kalır.</li>
+        <li>Font dosyaları tek başına satılamaz.</li>
+      </ol>
+      <div class="muted" style="font-size:13.5px;margin-top:auto">Telif bilgileri ve lisansın tam metni paketteki <a href="../dist/Shimati/OFL.txt">OFL.txt</a> dosyasındadır.</div>
+    </div>
+  </div>
+  <div class="dl-cta"><b>Shimati %%VERSION%%</b>
+    <div class="cta"><a class="btn primary" href="../dist/Shimati-%%VERSION%%.zip" download>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v9M4 7.5 8 11.5l4-4M2.5 14h11"/></svg>Paketi indir (.zip)</a></div></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><div class="label" style="margin-bottom:10px">Shimati %%VERSION%% · 2026</div><div class="sign">Made by <span>Doruk Aktun</span></div></div>
+  <div class="muted" style="font-size:13.5px">SIL Open Font License 1.1</div>
+</div></footer>
+
+<script>
+const D = %%DATA%%;
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+/* Tema */
+$("#theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("shimati-theme", root.dataset.theme); } catch (e) {}
+});
+
+/* Deneme alanı */
+const PRESETS = [
+  ["Işık, gölge ve biraz cesaret.", 72],
+  ["Pijamalı hasta yağız şoföre çabucak güvendi. Jale, Japonya’dan dönerken jöle ve reçel almıştı.", 44],
+  ["İyi bir yazı karakteri, okuru yormadan geri çekilmeyi bilir. Arayüzde her gün binlerce kez görülecek harflerin tek tek ne kadar güzel olduğundan çok, birbirleriyle nasıl anlaştıkları önemlidir: a ile e aynı ritimde nefes almalı, ı ile i aynı sessizlikte durmalı, ş ile ç kuyruklarıyla satırın altına taşmadan Türkçeyi rahatça taşıyabilmeli.", 22],
+  ["0123456789 ₺ 1.234,56 % 18,5 — 06.10.2026", 64],
+];
+const tText = $("#t-text"), tW = $("#t-w"), tS = $("#t-s");
+function tUpdate() {
+  tText.style.fontWeight = tW.value; $("#t-wo").value = tW.value;
+  tText.style.fontSize = tS.value + "px"; $("#t-so").value = tS.value;
+  tText.style.lineHeight = tS.value > 40 ? 1.08 : 1.5;
+  tText.style.letterSpacing = tS.value > 40 ? "-0.02em" : "0";
+}
+tW.oninput = tS.oninput = tUpdate;
+$$("#t-presets .chip").forEach(b => b.onclick = () => {
+  $$("#t-presets .chip").forEach(x => x.setAttribute("aria-pressed", x === b));
+  const [txt, size] = PRESETS[b.dataset.k]; tText.textContent = txt; tS.value = size; tUpdate();
+});
+$("#t-cv").onclick = e => {
+  const on = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", on); tText.classList.toggle("cv08", on);
+};
+tUpdate();
+
+/* Ağırlıklar */
+const STYLES = [["Regular", 400], ["Medium", 500], ["SemiBold", 600], ["Bold", 700], ["ExtraBold", 800]];
+const WSAMPLE = ["Sessiz bir çağrı", "Gündüz ışığında", "Çizginin ritmi", "Ağır ve güçlü", "Şimdi, burada"];
+$("#weights").innerHTML = STYLES.map(([n, w], i) =>
+  `<div class="wrow"><div class="meta"><b style="font-weight:${w}">${n}</b><span class="label">${w}</span></div>
+   <div class="s" style="font-weight:${w}">${WSAMPLE[i]}</div></div>`).join("");
+
+/* Ölçek */
+const SCALE = [["Ekran", 72, 800, 1.0, -.04, "Biçim, işlevi izler."], ["Başlık 1", 48, 700, 1.05, -.03, "Yeni dönem, yeni ses"],
+  ["Başlık 2", 36, 700, 1.1, -.025, "Küçük ayrıntılar büyük fark yaratır"], ["Başlık 3", 28, 600, 1.15, -.02, "Ürün ekibi için haftalık özet"],
+  ["Başlık 4", 22, 600, 1.25, -.01, "Hesap ayarları ve güvenlik"], ["Gövde", 17, 400, 1.55, 0, "Uzun metinlerde göz yorulmadan ilerler; harfler arasındaki boşluk ritmi korur, satırlar düzenli bir doku oluşturur."],
+  ["Küçük", 14, 400, 1.5, .005, "Son güncelleme 6 Ekim 2026, 14.32"], ["Not", 12, 500, 1.4, .02, "Tüm fiyatlara KDV dahildir."]];
+$("#scale").innerHTML = SCALE.map(([n, s, w, lh, ls, t]) =>
+  `<div class="scale-row"><div><b style="font-weight:600">${n}</b><div class="label">${s} / ${Math.round(s * lh)} · ${w}</div></div>
+   <p class="t" style="font-size:${s}px;font-weight:${w};line-height:${lh};letter-spacing:${ls}em">${t}</p></div>`).join("");
+
+/* ---- Çizimler ---- */
+const NS = "http://www.w3.org/2000/svg";
+const MAP = [[400, 400], [500, 500], [600, 600], [700, 650], [800, 900]];
+function design(u) { for (let i = 1; i < MAP.length; i++) if (u <= MAP[i][0]) { const [a, b] = [MAP[i - 1], MAP[i]]; return a[1] + (u - a[0]) / (b[0] - a[0]) * (b[1] - a[1]); } return 900; }
+const tOf = u => (design(u) - 400) / 500;
+const lerp = (a, b, t) => a + (b - a) * t;
+function metricsAt(t) { const r = D.m.r, b = D.m.b; return { asc: lerp(r.asc, b.asc, t), cap: lerp(r.cap, b.cap, t), xh: lerp(r.xh, b.xh, t), desc: lerp(r.desc, b.desc, t) }; }
+function glyphAt(name, t) {
+  const g = D.g[name];
+  const cs = g.r.c.map((c, i) => { const cb = g.b.c[i], out = [];
+    for (let k = 0; k < c.length; k += 3) out.push({ x: lerp(c[k], cb[k], t), y: lerp(c[k + 1], cb[k + 1], t), t: c[k + 2] & 3, s: !!(c[k + 2] & 4) });
+    return out; });
+  return { w: lerp(g.r.w, g.b.w, t), cs };
+}
+const f1 = v => Math.round(v * 10) / 10;
+function pathD(cs, ox, by) {
+  const X = p => f1(ox + p.x), Y = p => f1(by - p.y);
+  let d = "";
+  for (const c of cs) {
+    const i = c.findIndex(p => p.t !== 0); const r = c.slice(i).concat(c.slice(0, i));
+    d += `M${X(r[0])} ${Y(r[0])}`; let off = [];
+    for (const p of r.slice(1).concat([r[0]])) {
+      if (p.t === 0) { off.push(p); continue; }
+      if (off.length === 2) d += `C${X(off[0])} ${Y(off[0])} ${X(off[1])} ${Y(off[1])} ${X(p)} ${Y(p)}`;
+      else if (off.length === 1) d += `Q${X(off[0])} ${Y(off[0])} ${X(p)} ${Y(p)}`;
+      else d += `L${X(p)} ${Y(p)}`;
+      off = [];
+    }
+    d += "Z";
+  }
+  return d;
+}
+function layers(cs, ox, by, ns) {
+  const X = p => f1(ox + p.x), Y = p => f1(by - p.y);
+  let handles = "", nodes = "", offs = "";
+  for (const c of cs) {
+    const n = c.length;
+    c.forEach((p, i) => {
+      if (p.t === 0) {
+        const a = c[(i - 1 + n) % n], b = c[(i + 1) % n];
+        if (a.t !== 0) handles += `M${X(a)} ${Y(a)}L${X(p)} ${Y(p)}`;
+        if (b.t !== 0) handles += `M${X(p)} ${Y(p)}L${X(b)} ${Y(b)}`;
+        offs += `<circle cx="${X(p)}" cy="${Y(p)}" r="${ns * .42}"/>`;
+      } else if (p.s) nodes += `<circle cx="${X(p)}" cy="${Y(p)}" r="${ns * .55}"/>`;
+      else nodes += `<rect x="${f1(X(p) - ns * .5)}" y="${f1(Y(p) - ns * .5)}" width="${ns}" height="${ns}"/>`;
+    });
+  }
+  return `<g class="l-handles"><path d="${handles}" fill="none" stroke="var(--handle)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <g fill="var(--node-fill)" stroke="var(--handle)" stroke-width="1.2" vector-effect="non-scaling-stroke">${offs}</g></g>
+    <g class="l-nodes" fill="var(--node-fill)" stroke="var(--node)" stroke-width="1.4">${nodes}</g>`;
+}
+function glyphSVG(cs, ox, by, ns) {
+  const d = pathD(cs, ox, by);
+  return `<path class="l-fill" d="${d}" fill="var(--glyph-fill)"/>
+    <path d="${d}" fill="none" stroke="var(--fg)" stroke-width="1.3" vector-effect="non-scaling-stroke"/>` + layers(cs, ox, by, ns);
+}
+function halo(x, y, txt, size, anchor = "start", color = "var(--metric)", weight = 600) {
+  return `<text x="${f1(x)}" y="${f1(y)}" font-size="${size}" font-weight="${weight}" text-anchor="${anchor}" fill="${color}"
+    stroke="var(--card)" stroke-width="${size * .28}" paint-order="stroke" stroke-linejoin="round">${txt}</text>`;
+}
+const LINES = [["asc", "Üst uzantı"], ["cap", "Büyük harf"], ["xh", "x yüksekliği"], ["base", "Taban çizgisi"], ["desc", "Alt uzantı"]];
+function metricLines(m, x0, x1, by, size, labels = true) {
+  let s = "";
+  for (const [k, name] of LINES) {
+    const v = k === "base" ? 0 : m[k], y = by - v;
+    s += `<line x1="${x0}" x2="${x1}" y1="${f1(y)}" y2="${f1(y)}" stroke="var(--metric)" stroke-width="1" ${k === "base" ? "" : 'stroke-dasharray="5 4"'} vector-effect="non-scaling-stroke" opacity="${k === "base" ? .9 : .7}"/>`;
+    if (labels) s += halo(x0 + size * .4, y - size * .45, `${name} · ${Math.round(v)}`, size);
+  }
+  return `<g class="l-metrics">${s}</g>`;
+}
+function flatten(cs) {
+  return cs.map(c => {
+    const i = c.findIndex(p => p.t !== 0); const r = c.slice(i).concat(c.slice(0, i));
+    const out = [r[0]]; let off = [], prev = r[0];
+    for (const p of r.slice(1).concat([r[0]])) {
+      if (p.t === 0) { off.push(p); continue; }
+      if (off.length === 2) for (let k = 1; k <= 24; k++) { const t = k / 24, m = 1 - t;
+        out.push({ x: m*m*m*prev.x + 3*m*m*t*off[0].x + 3*m*t*t*off[1].x + t*t*t*p.x, y: m*m*m*prev.y + 3*m*m*t*off[0].y + 3*m*t*t*off[1].y + t*t*t*p.y }); }
+      else out.push(p);
+      prev = p; off = [];
+    }
+    return out;
+  });
+}
+function hits(polys, y) {
+  const xs = [];
+  for (const P of polys) for (let i = 0; i < P.length - 1; i++) { const a = P[i], b = P[i + 1];
+    if ((a.y <= y && b.y > y) || (b.y <= y && a.y > y)) xs.push(a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x)); }
+  return xs.sort((a, b) => a - b);
+}
+function bbox(polys) {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (const P of polys) for (const p of P) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); }
+  return { x0, y0, x1, y1 };
+}
+function dimH(xa, xb, y, label, size) {
+  const t = size * .45;
+  return `<g stroke="var(--accent)" stroke-width="1.4" vector-effect="non-scaling-stroke">
+    <line x1="${f1(xa)}" x2="${f1(xb)}" y1="${f1(y)}" y2="${f1(y)}" vector-effect="non-scaling-stroke"/>
+    <line x1="${f1(xa)}" x2="${f1(xa)}" y1="${f1(y - t)}" y2="${f1(y + t)}" vector-effect="non-scaling-stroke"/>
+    <line x1="${f1(xb)}" x2="${f1(xb)}" y1="${f1(y - t)}" y2="${f1(y + t)}" vector-effect="non-scaling-stroke"/></g>` +
+    halo((xa + xb) / 2, y - size * .8, label, size, "middle", "var(--accent)", 700);
+}
+function dimV(x, ya, yb, label, size, side = 1) {
+  const t = size * .45;
+  return `<g stroke="var(--accent)" stroke-width="1.4">
+    <line x1="${f1(x)}" x2="${f1(x)}" y1="${f1(ya)}" y2="${f1(yb)}" vector-effect="non-scaling-stroke"/>
+    <line x1="${f1(x - t)}" x2="${f1(x + t)}" y1="${f1(ya)}" y2="${f1(ya)}" vector-effect="non-scaling-stroke"/>
+    <line x1="${f1(x - t)}" x2="${f1(x + t)}" y1="${f1(yb)}" y2="${f1(yb)}" vector-effect="non-scaling-stroke"/></g>` +
+    halo(x + side * size * .7, (ya + yb) / 2 + size * .35, label, size, side > 0 ? "start" : "end", "var(--accent)", 700);
+}
+function sidebearings(ox, w, top, bottom, b, by, size) {
+  const lsb = Math.round(b.x0), rsb = Math.round(w - b.x1);
+  return `<g class="l-metrics"><g stroke="var(--line-2)" stroke-width="1" vector-effect="non-scaling-stroke">
+    <line x1="${f1(ox)}" x2="${f1(ox)}" y1="${top}" y2="${bottom}" vector-effect="non-scaling-stroke"/>
+    <line x1="${f1(ox + w)}" x2="${f1(ox + w)}" y1="${top}" y2="${bottom}" vector-effect="non-scaling-stroke"/></g>
+    ${halo(ox + 8, bottom - size * .6, lsb, size, "start", "var(--muted)", 500)}${halo(ox + w - 8, bottom - size * .6, rsb, size, "end", "var(--muted)", 500)}</g>`;
+}
+
+/* Sözcük çizimi */
+const TOP = 880, BOT = -330;
+function drawWord(t) {
+  const m = metricsAt(t), W = lerp(D.word.wr, D.word.wb, t), pad = 140, by = TOP;
+  let s = metricLines(m, -pad, W + pad, by, 30);
+  D.word.r.forEach(([name, xr], i) => { const x = lerp(xr, D.word.b[i][1], t); s += glyphSVG(glyphAt(name, t).cs, x, by, 13); });
+  const svg = $("#word-svg");
+  svg.setAttribute("viewBox", `${-pad} 0 ${f1(W + 2 * pad)} ${TOP - BOT}`);
+  svg.innerHTML = s;
+}
+
+/* Kartlar */
+const CARD_W = 1000, CTOP = 860, CBOT = -300;
+const CARD_NAMES = { n: ["n", "Gövde kalınlığı"], o: ["o", "Taşma payı"], a: ["a", "Sağ gövde"], scedilla: ["ş", "Çengel derinliği"], gbreve: ["ğ", "Kısa şapka"], J: ["J", "Gövde ve çanak"] };
+function cardSVG(name, t) {
+  const g = glyphAt(name, t), m = metricsAt(t), polys = flatten(g.cs), b = bbox(polys), ox = (CARD_W - g.w) / 2, by = CTOP, sz = 44;
+  const X = x => ox + x, Y = y => by - y;
+  let s = metricLines(m, 0, CARD_W, by, 26, false) + sidebearings(ox, g.w, 20, CTOP - CBOT - 20, b, by, 36) + glyphSVG(g.cs, ox, by, 13);
+  let ann = "";
+  if (name === "n") { const xs = hits(polys, m.xh * .42); if (xs.length > 1) ann = dimH(X(xs[0]), X(xs[1]), Y(m.xh * .42), Math.round(xs[1] - xs[0]), sz); }
+  if (name === "a") { const y = m.xh * .3, xs = hits(polys, y); if (xs.length > 1) { const [p, q] = xs.slice(-2); ann = dimH(X(p), X(q), Y(y), Math.round(q - p), sz); } }
+  if (name === "J") { const y = m.cap * .62, xs = hits(polys, y); if (xs.length > 1) { const [p, q] = xs.slice(-2); ann = dimH(X(p), X(q), Y(y), Math.round(q - p), sz); } }
+  if (name === "o") {
+    const bandL = X(b.x0) - 30, bandW = b.x1 - b.x0 + 60;
+    ann = `<rect x="${f1(bandL)}" y="${f1(Y(0))}" width="${f1(bandW)}" height="${f1(-b.y0)}" fill="var(--accent-soft)"/>
+      <rect x="${f1(bandL)}" y="${f1(Y(b.y1))}" width="${f1(bandW)}" height="${f1(b.y1 - m.xh)}" fill="var(--accent-soft)"/>` +
+      dimV(X(b.x1) + 60, Y(0), Y(b.y0), Math.round(-b.y0), sz) + dimV(X(b.x1) + 60, Y(m.xh), Y(b.y1), Math.round(b.y1 - m.xh), sz);
+  }
+  if (name === "scedilla") ann = dimV(X(b.x1) + 50, Y(0), Y(b.y0), Math.round(-b.y0), sz);
+  if (name === "gbreve") ann = dimV(X(b.x1) + 50, Y(m.xh), Y(b.y1), Math.round(b.y1 - m.xh), sz);
+  return { svg: s + ann, w: g.w, lsb: Math.round(b.x0), rsb: Math.round(g.w - b.x1) };
+}
+function drawCards(t) {
+  const box = $("#cards");
+  if (!box.children.length) box.innerHTML = D.cards.map(n =>
+    `<div class="card"><svg viewBox="0 0 ${CARD_W} ${CTOP - CBOT}" data-g="${n}"></svg><div class="cap"><b>${CARD_NAMES[n][1]}</b><span class="muted" data-w></span></div></div>`).join("");
+  for (const svg of box.querySelectorAll("svg")) {
+    const r = cardSVG(svg.dataset.g, t); svg.innerHTML = r.svg;
+    svg.parentElement.querySelector("[data-w]").textContent = `${CARD_NAMES[svg.dataset.g][0]} · ${Math.round(r.w)}`;
+  }
+}
+
+/* Eksen çizimi */
+function drawAxis() {
+  const names = ["a", "S"], gap = 160, by = 860;
+  let x = 0, s = "", vec = "";
+  const m0 = metricsAt(0), m1 = metricsAt(1);
+  const items = names.map(n => { const a = glyphAt(n, 0), b = glyphAt(n, 1); const it = { a, b, x }; x += Math.max(a.w, b.w) + gap; return it; });
+  const W = x - gap;
+  s += metricLines(m0, -60, W + 60, by, 26, false);
+  for (const { a, b, x } of items) {
+    s += `<path d="${pathD(a.cs, x, by)}" fill="none" stroke="var(--handle)" stroke-width="1.3" vector-effect="non-scaling-stroke"/>`;
+    s += `<path class="l-fill" d="${pathD(b.cs, x, by)}" fill="var(--glyph-fill)" stroke="var(--fg)" stroke-width="1.3" vector-effect="non-scaling-stroke"/>`;
+    a.cs.forEach((c, i) => c.forEach((p, k) => { if (p.t === 0) return; const q = b.cs[i][k];
+      vec += `M${f1(x + p.x)} ${f1(by - p.y)}L${f1(x + q.x)} ${f1(by - q.y)}`;
+      s += `<circle cx="${f1(x + p.x)}" cy="${f1(by - p.y)}" r="5" fill="var(--handle)"/><circle cx="${f1(x + q.x)}" cy="${f1(by - q.y)}" r="6" fill="var(--fg)"/>`; }));
+  }
+  s = s.replace(/^/, "") + `<path d="${vec}" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke" fill="none"/>`;
+  const svg = $("#axis-svg");
+  svg.setAttribute("viewBox", `-60 0 ${W + 120} ${860 + 300}`);
+  svg.innerHTML = s;
+}
+
+/* Ölçü tablosu */
+function measure(t) {
+  const m = metricsAt(t);
+  const stem = (n, y) => { const xs = hits(flatten(glyphAt(n, t).cs), y); return Math.round(xs[1] - xs[0]); };
+  const ob = bbox(flatten(glyphAt("o", t).cs));
+  const lower = "abcdefghijklmnopqrstuvwxyz".split("").map(c => D.g[c] ? glyphAt(c, t).w : 0);
+  return [["x yüksekliği", Math.round(m.xh)], ["Büyük harf yüksekliği", Math.round(m.cap)], ["Üst / alt uzantı", `${Math.round(m.asc)} / ${Math.round(m.desc)}`],
+    ["n gövdesi", stem("n", m.xh * .42)], ["H gövdesi", stem("H", m.cap * .25)], ["o taşma payı", Math.round(-ob.y0)],
+    ["Ortalama küçük harf genişliği", Math.round(lower.reduce((a, b) => a + b, 0) / lower.length)]];
+}
+(() => {
+  const a = measure(0), b = measure(1);
+  $("#specs tbody").innerHTML = a.map(([k, v], i) => `<tr><th>${k}</th><td>${v}</td><td>${b[i][1]}</td></tr>`).join("") +
+    `<tr><th>Birim / em</th><td colspan="2">${D.upm}</td></tr><tr><th>Glif</th><td colspan="2">${D.count.glyphs}</td></tr>`;
+})();
+
+/* Glif inceleyici */
+const GROUPS = ["Büyük harfler", "Küçük harfler", "Rakamlar", "Noktalama", "Simgeler"];
+const GROUP1 = { "Büyük harfler": "Büyük harf", "Küçük harfler": "Küçük harf", "Rakamlar": "Rakam", "Noktalama": "Noktalama", "Simgeler": "Simge" };
+let selected = D.chars.find(c => c[0] === 0x11F) || D.chars[0];
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+$("#glyph-grid").innerHTML = GROUPS.map(gr => {
+  const items = D.chars.filter(c => c[2] === gr);
+  return `<div class="grid-group"><h3>${gr} · ${items.length}</h3><div class="gl">${items.map(c =>
+    `<button data-u="${c[0]}" aria-pressed="${c === selected}" title="U+${c[0].toString(16).toUpperCase().padStart(4, "0")}">${esc(String.fromCodePoint(c[0]))}</button>`).join("")}</div></div>`;
+}).join("");
+$("#glyph-grid").addEventListener("click", e => {
+  const b = e.target.closest("button[data-u]"); if (!b) return;
+  $$("#glyph-grid button[aria-pressed=true]").forEach(x => x.setAttribute("aria-pressed", "false"));
+  b.setAttribute("aria-pressed", "true");
+  selected = D.chars.find(c => c[0] === +b.dataset.u); drawInspector(W);
+  if (innerWidth < 860) $("#insp-fig").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+function drawInspector(u) {
+  const t = tOf(u), [cp, name, gr] = selected, g = glyphAt(name, t), m = metricsAt(t), polys = flatten(g.cs), b = bbox(polys);
+  const VW = 1400, by = 880, ox = (VW - g.w) / 2;
+  const svg = $("#insp-svg");
+  svg.setAttribute("viewBox", `0 0 ${VW} ${TOP - BOT}`);
+  svg.innerHTML = metricLines(m, 0, VW, by, 26) + sidebearings(ox, g.w, 20, TOP - BOT - 20, b, by, 26) + glyphSVG(g.cs, ox, by, 13);
+  const ch = String.fromCodePoint(cp);
+  $("#insp-char").textContent = ch; $("#insp-char").style.fontWeight = u;
+  $("#insp-group").textContent = GROUP1[gr];
+  $("#i-u").textContent = "U+" + cp.toString(16).toUpperCase().padStart(4, "0");
+  $("#i-n").textContent = name;
+  $("#i-w").textContent = Math.round(g.w);
+  $("#i-sb").textContent = g.cs.length ? `${Math.round(b.x0)} / ${Math.round(g.w - b.x1)}` : "–";
+  $("#i-p").textContent = `${g.cs.length} / ${g.cs.reduce((a, c) => a + c.length, 0)}`;
+}
+
+/* Ortak ağırlık ve görünüm düğmeleri */
+let W = 400;
+function setW(u) {
+  W = +u; const t = tOf(W);
+  $$(".w-shared").forEach(i => i.value = W); $$(".w-out").forEach(o => o.value = W);
+  $$(".gl button").forEach(bt => bt.style.fontWeight = W);
+  drawWord(t); drawCards(t); drawInspector(W);
+}
+$$(".w-shared").forEach(i => i.addEventListener("input", e => setW(e.target.value)));
+$$("[data-toggles]").forEach(group => group.addEventListener("click", e => {
+  const b = e.target.closest("[data-t]"); if (!b) return;
+  const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", on);
+  const targets = group.dataset.toggles === "word-fig" ? [$("#word-fig"), $("#cards")] : [$("#" + group.dataset.toggles)];
+  targets.forEach(el => el.dataset[b.dataset.t] = on ? "1" : "0");
+}));
+setW(400); drawAxis();
+</script>
+</body>
+</html>
