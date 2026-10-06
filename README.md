@@ -99,4 +99,5 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 
 ## Açık konular
 
-- Gerçek arayüz metinlerinde (küçük boyut, ekran) gözle kontrol; özellikle 12–14 px'te `cv08` gerekip gerekmediği.
+- Gerçek arayüz metinlerinde (küçük boyut, ekran) gözle kontrol.
+- Karar: varsayılan düz `I`/`ı` kalacak (konu kapandı).
