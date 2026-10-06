@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="grave" format="2">
-  <advance width="314"/>
+  <advance width="279"/>
   <unicode hex="0060"/>
-  <anchor x="198" y="500" name="_top"/>
+  <anchor x="179" y="500" name="_top"/>
   <outline>
-    <component base="gravecomb"/>
+    <component base="gravecomb" xOffset="-8"/>
   </outline>
   <lib>
     <dict>

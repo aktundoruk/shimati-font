@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="lacute" format="2">
-  <advance width="312"/>
+  <advance width="294"/>
   <unicode hex="013A"/>
-  <anchor x="156" y="0" name="bottom"/>
-  <anchor x="228" y="920" name="top"/>
-  <anchor x="245" y="722" name="topright"/>
+  <anchor x="147" y="0" name="bottom"/>
+  <anchor x="214" y="920" name="top"/>
+  <anchor x="224" y="722" name="topright"/>
   <outline>
     <component base="l"/>
-    <component base="acutecomb" xOffset="21" yOffset="210"/>
+    <component base="acutecomb" xOffset="22" yOffset="210"/>
   </outline>
   <lib>
     <dict>

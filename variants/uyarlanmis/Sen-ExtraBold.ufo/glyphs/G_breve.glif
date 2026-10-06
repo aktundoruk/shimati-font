@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Gbreve" format="2">
-  <advance width="695"/>
+  <advance width="630"/>
   <unicode hex="011E"/>
-  <anchor x="423" y="0" name="bottom"/>
-  <anchor x="373" y="870" name="top"/>
+  <anchor x="387" y="0" name="bottom"/>
+  <anchor x="336" y="870" name="top"/>
   <outline>
     <component base="G"/>
-    <component base="brevecomb" xOffset="131" yOffset="160"/>
+    <component base="brevecomb" xOffset="116" yOffset="160"/>
   </outline>
   <lib>
     <dict>

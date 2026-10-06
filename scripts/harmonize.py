@@ -22,6 +22,7 @@ from fontTools.ttLib import TTFont
 
 sys.path.insert(0, str(Path(__file__).parent))
 from geom import bounds, contours_of, runs_at_x, runs_at_y  # noqa: E402
+from condense import condense, track  # noqa: E402
 from kerning import adjust as adjust_kerning, optical_gap  # noqa: E402
 from terminals import (  # noqa: E402
     _outer_is_in, find_terminals, make_vertical, make_vertical_at, sen_cut_lengths, terminal_rel_x,
@@ -44,6 +45,10 @@ TERMINAL_LENGTH_EXTRABOLD = 0.25
 CUT_TERMINALS = ("top",)
 # æ iki bölmeli ve sıkışık; Black ötesine ekstrapolasyon a ile e arasındaki boşlukları kapatıyor.
 AE_TY_CAP = 1.2
+# Daraltma: küçük harflerin ortalama genişliği bu oranda daralır, dikey gövdeler aynı kalır.
+CONDENSE = 0.92
+# Genel aralık sıkıştırma: her yan boşluktan çıkarılan birim (Regular, ExtraBold).
+TRACKING = {"Regular": 8, "ExtraBold": 0}
 # Boşluk düzeltmesi bu nötr harflere göre yapılır (kerning gerektirmeyen ortaklar).
 NEUTRAL_PARTNERS = ["n", "o", "i", "l", "H", "O"]
 # Inter'in çengel kasesi Regular→Black arasında az kalınlaşıyor; Sen'in ExtraBold çengeline yetişmek
@@ -228,9 +233,15 @@ def build_straight(sen, variant):
         else:
             t = solve(lambda t: _w(left_stem(ig.at(t, 0), INTER_XH * 0.2)) * sx, r_stem)
             src = ig.at(t, 0)
-            i_ink, ir_lsb = ink(src), ink(iref.at(t, 0))[0]
+            # sol boşluk referansın sol gövdesine, sağ boşluk referansın sağ gövdesine göre
+            # (Sen n'nin sağ boşluğu soldakinden dar: 70 / 85; ı'nın sağı da öyle olmalı)
+            ir = iref.at(t, 0)
+            ir_ink = ink(ir)
+            ir_lsb, ir_rsb = ir_ink[0], iref.advance(t) - ir_ink[2]
+            r_rsb = sen[ref].width - ink(s_ref)[2]
+            i_ink = ink(src)
             lsb = r_lsb * i_ink[0] / ir_lsb
-            rsb = r_lsb * (ig.advance(t) - i_ink[2]) / ir_lsb
+            rsb = r_rsb * (ig.advance(t) - i_ink[2]) / ir_rsb
         lsb, rsb = round(lsb), round(rsb)
         shaped = transform(src, sx, sy, lambda y: y, 0)
         final = transform(shaped, 1, 1, lambda y: y, lsb - ink(shaped)[0])
@@ -749,6 +760,9 @@ if __name__ == "__main__":
     all_logs = {}
     for variant in ("dogrudan", "uyarlanmis"):
         fonts, log = harmonize(variant)
+        if variant == "uyarlanmis":
+            log["condense"] = condense(fonts["Regular"], fonts["ExtraBold"], CONDENSE)
+            log["tracking"] = {m: track(fonts[m], TRACKING[m]) for m in MASTERS}
         out = ROOT / "variants" / variant
         if out.exists():
             shutil.rmtree(out)

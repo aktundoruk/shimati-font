@@ -356,12 +356,12 @@
      "scale": 0.4472,
      "stem": 82,
      "lsb": 85,
-     "rsb": 85,
-     "width": 252
+     "rsb": 70,
+     "width": 237
     },
     "i": {
      "dot_shift": -39,
-     "width": 252
+     "width": 237
     }
    },
    "cedilla": {
@@ -624,12 +624,12 @@
      "scale": 0.4562,
      "stem": 172,
      "lsb": 70,
-     "rsb": 70,
-     "width": 312
+     "rsb": 65,
+     "width": 307
     },
     "i": {
      "dot_shift": -42,
-     "width": 312
+     "width": 307
     }
    },
    "cedilla": {
@@ -893,6 +893,38 @@
      "existed": false
     }
    ]
+  },
+  "condense": {
+   "Regular": {
+    "t": 0.085,
+    "weight_x": 443,
+    "scale_x": 0.9145,
+    "stem": [
+     82,
+     82.0
+    ],
+    "avg_width": [
+     537,
+     494
+    ]
+   },
+   "ExtraBold": {
+    "t": 1.193,
+    "weight_x": 996,
+    "scale_x": 0.9084,
+    "stem": [
+     172,
+     172.0
+    ],
+    "avg_width": [
+     575,
+     529
+    ]
+   }
+  },
+  "tracking": {
+   "Regular": 8,
+   "ExtraBold": 0
   }
  }
 }

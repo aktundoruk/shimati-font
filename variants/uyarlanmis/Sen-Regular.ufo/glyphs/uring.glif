@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="uring" format="2">
-  <advance width="564"/>
+  <advance width="504"/>
   <unicode hex="016F"/>
-  <anchor x="360" y="10" name="ogonek"/>
-  <anchor x="287" y="725" name="top"/>
+  <anchor x="325" y="10" name="ogonek"/>
+  <anchor x="257" y="725" name="top"/>
   <outline>
     <component base="u"/>
-    <component base="ringcomb" xOffset="124"/>
+    <component base="ringcomb" xOffset="107"/>
   </outline>
   <lib>
     <dict>

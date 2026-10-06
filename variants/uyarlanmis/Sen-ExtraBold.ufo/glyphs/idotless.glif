@@ -1,15 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="idotless" format="2">
-  <advance width="312"/>
+  <advance width="291"/>
   <unicode hex="0131"/>
-  <anchor x="243" y="0" name="ogonek"/>
-  <anchor x="156" y="510" name="top"/>
+  <anchor x="234" y="0" name="ogonek"/>
+  <anchor x="147" y="510" name="top"/>
   <outline>
     <contour>
-      <point x="70" y="0" type="line"/>
-      <point x="242" y="0" type="line"/>
-      <point x="242" y="510" type="line"/>
-      <point x="70" y="510" type="line"/>
+      <point x="61" y="0" type="line"/>
+      <point x="233" y="0" type="line"/>
+      <point x="233" y="510" type="line"/>
+      <point x="61" y="510" type="line"/>
     </contour>
   </outline>
   <lib>

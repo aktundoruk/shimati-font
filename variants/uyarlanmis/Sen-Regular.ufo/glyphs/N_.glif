@@ -1,21 +1,21 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="N" format="2">
-  <advance width="779"/>
+  <advance width="696"/>
   <unicode hex="004E"/>
-  <anchor x="389" y="0" name="bottom"/>
-  <anchor x="387" y="670" name="top"/>
+  <anchor x="348" y="0" name="bottom"/>
+  <anchor x="346" y="670" name="top"/>
   <outline>
     <contour>
-      <point x="635" y="0" type="line"/>
-      <point x="669" y="0" type="line"/>
-      <point x="669" y="670" type="line"/>
-      <point x="579" y="670" type="line"/>
-      <point x="579" y="185" type="line"/>
-      <point x="144" y="670" type="line"/>
-      <point x="110" y="670" type="line"/>
-      <point x="110" y="0" type="line"/>
-      <point x="200" y="0" type="line"/>
-      <point x="200" y="479" type="line"/>
+      <point x="572" y="0" type="line"/>
+      <point x="606" y="0" type="line"/>
+      <point x="606" y="670" type="line"/>
+      <point x="516" y="670" type="line"/>
+      <point x="516" y="185" type="line"/>
+      <point x="124" y="670" type="line"/>
+      <point x="90" y="670" type="line"/>
+      <point x="90" y="0" type="line"/>
+      <point x="180" y="0" type="line"/>
+      <point x="180" y="479" type="line"/>
     </contour>
   </outline>
   <lib>

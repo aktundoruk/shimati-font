@@ -1,24 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="A" format="2">
-  <advance width="732"/>
+  <advance width="672"/>
   <unicode hex="0041"/>
-  <anchor x="653" y="10" name="ogonek"/>
-  <anchor x="364" y="670" name="top"/>
+  <anchor x="591" y="10" name="ogonek"/>
+  <anchor x="334" y="670" name="top"/>
   <outline>
     <contour>
       <point x="15" y="0" type="line"/>
-      <point x="233" y="0" type="line"/>
-      <point x="366" y="378" type="line"/>
-      <point x="499" y="0" type="line"/>
-      <point x="717" y="0" type="line"/>
-      <point x="413" y="680" type="line"/>
-      <point x="319" y="680" type="line"/>
+      <point x="232" y="0" type="line"/>
+      <point x="336" y="378" type="line"/>
+      <point x="440" y="0" type="line"/>
+      <point x="658" y="0" type="line"/>
+      <point x="383" y="680" type="line"/>
+      <point x="289" y="680" type="line"/>
     </contour>
     <contour>
-      <point x="166" y="100" type="line"/>
-      <point x="547" y="100" type="line"/>
-      <point x="547" y="240" type="line"/>
-      <point x="166" y="240" type="line"/>
+      <point x="151" y="100" type="line"/>
+      <point x="498" y="100" type="line"/>
+      <point x="498" y="240" type="line"/>
+      <point x="151" y="240" type="line"/>
     </contour>
   </outline>
   <lib>

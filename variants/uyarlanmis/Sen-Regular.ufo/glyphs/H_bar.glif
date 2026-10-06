@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Hbar" format="2">
-  <advance width="782"/>
+  <advance width="699"/>
   <unicode hex="0126"/>
   <outline>
     <contour>
-      <point x="66" y="486" type="line"/>
-      <point x="716" y="486" type="line"/>
-      <point x="716" y="566" type="line"/>
-      <point x="66" y="566" type="line"/>
+      <point x="48" y="486" type="line"/>
+      <point x="651" y="486" type="line"/>
+      <point x="651" y="566" type="line"/>
+      <point x="48" y="566" type="line"/>
     </contour>
     <component base="H"/>
   </outline>

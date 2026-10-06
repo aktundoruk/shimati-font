@@ -1,18 +1,18 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="lslash" format="2">
-  <advance width="341"/>
+  <advance width="317"/>
   <unicode hex="0142"/>
-  <anchor x="171" y="0" name="bottom"/>
-  <anchor x="200" y="720" name="top"/>
-  <anchor x="260" y="722" name="topright"/>
+  <anchor x="161" y="0" name="bottom"/>
+  <anchor x="192" y="720" name="top"/>
+  <anchor x="238" y="722" name="topright"/>
   <outline>
     <contour>
-      <point x="10" y="173" type="line"/>
-      <point x="331" y="381" type="line"/>
-      <point x="331" y="537" type="line"/>
-      <point x="10" y="329" type="line"/>
+      <point x="9" y="173" type="line"/>
+      <point x="308" y="381" type="line"/>
+      <point x="308" y="537" type="line"/>
+      <point x="9" y="329" type="line"/>
     </contour>
-    <component base="l" xOffset="15"/>
+    <component base="l" xOffset="14"/>
   </outline>
   <lib>
     <dict>

@@ -9,6 +9,7 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 .venv/bin/python scripts/harmonize.py      # variants/dogrudan, variants/uyarlanmis + build/olcumler.json
 .venv/bin/fontmake -m variants/uyarlanmis/Sen.designspace -o variable --output-path build/Sen-uyarlanmis-VF.ttf
 .venv/bin/python scripts/proof.py          # proof/proof.html
+.venv/bin/python scripts/ozet.py           # proof/ozet.html — Türkçe özet sayfası (başlık, paragraf, arayüz)
 .venv/bin/python scripts/render_png.py "metin 1" "metin 2"   # proof/karsilastirma.png
 ```
 
@@ -38,7 +39,8 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
   glifle eşitlenir. Sıkıştırma serbest; gevşetme yalnızca gerçek çarpışmada (en dar boşluk
   eskisinin %60'ının altına inerse) ve onu giderecek kadar. Yeni çift yalnızca |değer| ≥ 30 ise eklenir.
 - `I` ve `ı` (`build_straight`): Inter'de ikisi de düz dikdörtgen. Gövde Sen'in `H` / `n` gövdesine
-  (90 / 187, 82 / 172), boşluklar `H` / `n`'nin sol boşluğuna eşitlenir (Inter'de oran 1:1). Sonuç: Sen'in
+  (90 / 187, 82 / 172), sol boşluk `H` / `n`'nin sol boşluğuna, sağ boşluk sağ boşluğuna eşitlenir
+  (Inter'de oran 1:1; Sen `n`'nin sağı solundan dar, 70 / 85, bu yüzden "ın" artık "nn" kadar sıkı). Sonuç: Sen'in
   `I` serifleri ve `ı` bayrağı kalkar; yeni `ı` Sen'in `l`'sinin x-height'te kesilmiş hâli olur.
   `i`, `ı` + nokta olduğu için o da bayraksız olur; nokta gövdenin ortasına alınır. `İ`, `í`, `į`, `Į`, `ij`,
   `IJ` vb. bileşikler çapalara göre yeniden kurulur (aksanların dikey konumu Sen'deki gibi kalır).
@@ -56,9 +58,20 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
   eski çapanın üstüne ortalanır, `i`'nin noktası gövdenin ortasına. Sen'de `i`'nin noktası (136 / 215) ile
   nokta aksanı (126 / 152; Türkçe `i` ve `İ` bunu kullanıyor) farklıydı, artık tek nokta (112 / 174).
   ExtraBold'da `İ` noktası bu yüzden biraz büyüdü (152 → 174), `i`'ninki küçüldü (215 → 174).
+- Daraltma (`scripts/condense.py`, en sonda): her masterın x koordinatları Regular–ExtraBold arasında
+  biraz daha kalın bir ağırlıktan alınıp ölçeklenir, y'ler aynı kalır. Ağırlık ve ölçek, `n` gövdesi aynı
+  kalacak ve küçük harflerin ortalama genişliği `CONDENSE` (0.92) oranına inecek şekilde çözülür
+  (Regular: x ağırlığı ≈ 443, ölçek 0.915; ExtraBold: ≈ 996 yani ExtraBold'un %19 ötesi, ölçek 0.908).
+  Bileşen ofsetleri, çapalar ve kerning de aynı dönüşümle; bağımsız noktalar (i, j, ., ¨, ˙, ÷) yuvarlak
+  kalsın diye yalnızca taşınır.
+- Aralık (`TRACKING`): Regular'da her yan boşluktan 8 birim çıkarılır; ExtraBold'da daraltma aralığı
+  zaten yeterince kıstığı için 0.
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
 ## Açık konular
+
+- **`₺` yok**: Sen'de Türk lirası işareti (U+20BA) bulunmuyor, tarayıcı sistem fontuna düşüyor. Tasarım
+  sistemi için eklenmeli (Inter'den uyarlanabilir).
 
 - **`I` / `l` / `1` ayrımı**: `I` ve `l` artık ikisi de düz çubuk, yalnızca boyları farklı (670 / 720).
   Arayüzde (kodlar, şifreler, "Il") karışabilir. Inter bu yüzden serifli `I` seçeneği sunuyor (cv08).

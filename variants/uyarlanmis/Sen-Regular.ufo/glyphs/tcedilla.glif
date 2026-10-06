@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="tcedilla" format="2">
-  <advance width="451"/>
+  <advance width="399"/>
   <unicode hex="0163"/>
-  <anchor x="254" y="0" name="bottom"/>
-  <anchor x="214" y="250" name="center"/>
-  <anchor x="265" y="720" name="topright"/>
+  <anchor x="228" y="0" name="bottom"/>
+  <anchor x="189" y="250" name="center"/>
+  <anchor x="239" y="720" name="topright"/>
   <outline>
     <component base="t"/>
-    <component base="cedillacomb" xOffset="97"/>
+    <component base="cedillacomb" xOffset="82"/>
   </outline>
   <lib>
     <dict>

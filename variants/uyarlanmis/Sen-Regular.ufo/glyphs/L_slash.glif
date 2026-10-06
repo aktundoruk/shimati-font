@@ -1,16 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Lslash" format="2">
-  <advance width="614"/>
+  <advance width="544"/>
   <unicode hex="0141"/>
-  <anchor x="326" y="0" name="bottom"/>
-  <anchor x="171" y="670" name="top"/>
-  <anchor x="245" y="720" name="topright"/>
+  <anchor x="289" y="0" name="bottom"/>
+  <anchor x="154" y="670" name="top"/>
+  <anchor x="221" y="720" name="topright"/>
   <outline>
     <contour>
-      <point x="20" y="233" type="line"/>
-      <point x="301" y="441" type="line"/>
-      <point x="301" y="517" type="line"/>
-      <point x="20" y="309" type="line"/>
+      <point x="10" y="233" type="line"/>
+      <point x="272" y="441" type="line"/>
+      <point x="272" y="517" type="line"/>
+      <point x="10" y="309" type="line"/>
     </contour>
     <component base="L"/>
   </outline>

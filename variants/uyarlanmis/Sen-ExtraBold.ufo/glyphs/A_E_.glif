@@ -1,25 +1,25 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="AE" format="2">
-  <advance width="1072"/>
+  <advance width="974"/>
   <unicode hex="00C6"/>
-  <anchor x="752" y="0" name="bottom"/>
-  <anchor x="359" y="10" name="ogonek"/>
-  <anchor x="88" y="670" name="top"/>
+  <anchor x="683" y="0" name="bottom"/>
+  <anchor x="331" y="10" name="ogonek"/>
+  <anchor x="84" y="670" name="top"/>
   <outline>
     <contour>
       <point x="15" y="0" type="line"/>
-      <point x="203" y="0" type="line"/>
-      <point x="557" y="508" type="line"/>
-      <point x="579" y="670" type="line"/>
-      <point x="488" y="670" type="line"/>
+      <point x="198" y="0" type="line"/>
+      <point x="510" y="508" type="line"/>
+      <point x="530" y="670" type="line"/>
+      <point x="441" y="670" type="line"/>
     </contour>
     <contour>
-      <point x="272" y="133" type="line"/>
-      <point x="593" y="133" type="line"/>
-      <point x="593" y="270" type="line"/>
-      <point x="272" y="270" type="line"/>
+      <point x="251" y="133" type="line"/>
+      <point x="543" y="133" type="line"/>
+      <point x="543" y="270" type="line"/>
+      <point x="251" y="270" type="line"/>
     </contour>
-    <component base="E" xOffset="428"/>
+    <component base="E" xOffset="388"/>
   </outline>
   <lib>
     <dict>

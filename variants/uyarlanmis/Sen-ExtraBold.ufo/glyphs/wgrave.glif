@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="wgrave" format="2">
-  <advance width="824"/>
+  <advance width="760"/>
   <unicode hex="1E81"/>
-  <anchor x="340" y="710" name="top"/>
+  <anchor x="314" y="710" name="top"/>
   <outline>
     <component base="w"/>
-    <component base="gravecomb" xOffset="133"/>
+    <component base="gravecomb" xOffset="112"/>
   </outline>
   <lib>
     <dict>

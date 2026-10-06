@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="oe" format="2">
-  <advance width="1012"/>
+  <advance width="907"/>
   <unicode hex="0153"/>
-  <anchor x="739" y="500" name="top"/>
-  <anchor x="719" y="0" name="bottom"/>
-  <anchor x="849" y="13" name="ogonek"/>
+  <anchor x="665" y="500" name="top"/>
+  <anchor x="646" y="0" name="bottom"/>
+  <anchor x="767" y="13" name="ogonek"/>
   <outline>
     <component base="o"/>
-    <component base="e" xOffset="443"/>
+    <component base="e" xOffset="401"/>
   </outline>
   <lib>
     <dict>
