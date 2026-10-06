@@ -228,72 +228,30 @@
    },
    "spacing": {
     "a": {
-     "lsb": -8,
+     "lsb": 0,
      "rsb": -9
     },
     "e": {
      "lsb": 0,
-     "rsb": -6
+     "rsb": -5
     },
     "ae": {
-     "lsb": -8,
-     "rsb": -6
+     "lsb": 0,
+     "rsb": 0
     }
    },
    "kerning": [
     {
      "pair": "F a",
      "old": 0,
-     "new": -140,
-     "existed": false
-    },
-    {
-     "pair": "O a",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "P a",
-     "old": 0,
      "new": -60,
-     "existed": false
-    },
-    {
-     "pair": "Q a",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "W a",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "oe a",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "r a",
-     "old": 0,
-     "new": -35,
      "existed": false
     },
     {
      "pair": "v a",
      "old": -20,
-     "new": -50,
-     "existed": true
-    },
-    {
-     "pair": "w a",
-     "old": 0,
      "new": -30,
-     "existed": false
+     "existed": true
     },
     {
      "pair": "a V",
@@ -320,147 +278,15 @@
      "existed": false
     },
     {
-     "pair": "e A",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "e AE",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "e I",
-     "old": 0,
-     "new": -35,
-     "existed": false
-    },
-    {
-     "pair": "e IJ",
-     "old": 0,
-     "new": -35,
-     "existed": false
-    },
-    {
-     "pair": "e X",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "e Z",
-     "old": 0,
-     "new": -40,
-     "existed": false
-    },
-    {
      "pair": "e x",
      "old": -20,
-     "new": -35,
+     "new": -25,
      "existed": true
     },
     {
      "pair": "F ae",
      "old": 0,
-     "new": -120,
-     "existed": false
-    },
-    {
-     "pair": "O ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "P ae",
-     "old": 0,
      "new": -60,
-     "existed": false
-    },
-    {
-     "pair": "Q ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "V ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "W ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "oe ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "r ae",
-     "old": 0,
-     "new": -35,
-     "existed": false
-    },
-    {
-     "pair": "v ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "w ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "y ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "ae A",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "ae AE",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "ae I",
-     "old": 0,
-     "new": -35,
-     "existed": false
-    },
-    {
-     "pair": "ae IJ",
-     "old": 0,
-     "new": -35,
-     "existed": false
-    },
-    {
-     "pair": "ae X",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "ae Z",
-     "old": 0,
-     "new": -35,
      "existed": false
     }
    ]
@@ -571,12 +397,6 @@
    },
    "kerning": [
     {
-     "pair": "D a",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
      "pair": "K a",
      "old": -40,
      "new": -25,
@@ -585,26 +405,14 @@
     {
      "pair": "P a",
      "old": 0,
-     "new": -50,
+     "new": -45,
      "existed": false
     },
     {
      "pair": "V a",
      "old": -80,
-     "new": -115,
+     "new": -100,
      "existed": true
-    },
-    {
-     "pair": "W a",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "f a",
-     "old": 0,
-     "new": -40,
-     "existed": false
     },
     {
      "pair": "k a",
@@ -615,26 +423,20 @@
     {
      "pair": "r a",
      "old": 0,
-     "new": -75,
+     "new": -55,
      "existed": true
     },
     {
      "pair": "v a",
      "old": -40,
-     "new": -75,
+     "new": -60,
      "existed": true
     },
     {
      "pair": "w a",
      "old": -40,
-     "new": -70,
+     "new": -60,
      "existed": true
-    },
-    {
-     "pair": "y a",
-     "old": 0,
-     "new": -35,
-     "existed": false
     },
     {
      "pair": "a V",
@@ -661,51 +463,15 @@
      "existed": false
     },
     {
-     "pair": "e Z",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "F ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
      "pair": "P ae",
      "old": 0,
-     "new": -50,
-     "existed": false
-    },
-    {
-     "pair": "V ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "f ae",
-     "old": 0,
-     "new": -35,
+     "new": -40,
      "existed": false
     },
     {
      "pair": "r ae",
      "old": 0,
-     "new": -70,
-     "existed": false
-    },
-    {
-     "pair": "v ae",
-     "old": 0,
-     "new": -30,
-     "existed": false
-    },
-    {
-     "pair": "y ae",
-     "old": 0,
-     "new": -30,
+     "new": -50,
      "existed": false
     }
    ]

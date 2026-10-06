@@ -23,9 +23,10 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 - Overshoot: Inter'in taşma payları Sen `o`'sununkilere eşlenir.
 - Boşluk: Inter'in a/e ile o/n arasındaki oranları, Sen'in o/n değerlerine uygulanır.
 - Aksanlı harfler ve `œ` yeni çapalara/genişliklere göre yeniden konumlandırılır.
-- Terminaller Sen gibi dik kesilir (`scripts/terminals.py`). Regular'da kesik uzunluğu Sen'in `c`/`e`
-  kesiğinin en fazla 1.25 katı; ExtraBold'da kesim yeri Regular'daki göreli konumdan alınır, iç kenar
-  dış kenara paralel uzatılır.
+- Terminaller Sen gibi dik kesilir (`scripts/terminals.py`). Önce Sen'deki kadar kısa kesim konumu
+  bulunur (kesik ≤ 1.25 × Sen'in `c`/`e` kesiği); `TERMINAL_LENGTH` (Regular 0.5, ExtraBold 0.25) kesimi
+  bu konumdan Inter'in orijinal uç noktasına doğru kaydırır. İç kenar, dış kenarın yönü ile kendi
+  yönünün ortasına göre yeniden kurulur. ExtraBold'da daha uzun uç, `e`'nin ağzını kapatıyor.
 - `æ` artık bileşik değil: Inter'in kendi `æ`'si a/e parametreleriyle uyarlanır (ExtraBold'da y
   ekstrapolasyonu 1.2 ile sınırlı, yoksa a ile e arasındaki boşluklar kapanıyor).
 - `ª`: Inter `º` → Sen `º` dönüşümü bulunur, aynısı Inter `ª`'ya uygulanır.
@@ -42,5 +43,5 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 - **æ tepe birleşimi**: Inter'in tasarımından gelen küçük V çentiği ExtraBold'da belirgin.
 - **ExtraBold yatay kalınlık**: Sen'e eşitlemek için Inter Black'in ötesine ~%45 ekstrapolasyon gerekti (y ağırlığı ≈1122).
   `a`'nın alt iç boşluğu bu yüzden dar.
-- **Kerning gözden geçirme**: otomatik çiftler (`build/olcumler.json` → `kerning`) mantıklı görünüyor ama
-  özellikle `F a` (−140) ve büyük harf + `e` çiftleri gerçek metinde kontrol edilmeli.
+- **Kerning gözden geçirme**: otomatik çiftler (`build/olcumler.json` → `kerning`; Regular 8, ExtraBold 13)
+  gerçek metinde kontrol edilmeli.

@@ -21,9 +21,9 @@
       <key>A</key>
       <integer>-60</integer>
       <key>a</key>
-      <integer>-140</integer>
+      <integer>-60</integer>
       <key>ae</key>
-      <integer>-120</integer>
+      <integer>-60</integer>
     </dict>
     <key>I</key>
     <dict>
@@ -52,26 +52,11 @@
     <dict>
       <key>T</key>
       <integer>-40</integer>
-      <key>a</key>
-      <integer>-30</integer>
-      <key>ae</key>
-      <integer>-30</integer>
     </dict>
     <key>P</key>
     <dict>
       <key>A</key>
       <integer>-80</integer>
-      <key>a</key>
-      <integer>-60</integer>
-      <key>ae</key>
-      <integer>-60</integer>
-    </dict>
-    <key>Q</key>
-    <dict>
-      <key>a</key>
-      <integer>-30</integer>
-      <key>ae</key>
-      <integer>-30</integer>
     </dict>
     <key>R</key>
     <dict>
@@ -93,17 +78,11 @@
     <dict>
       <key>A</key>
       <integer>-60</integer>
-      <key>ae</key>
-      <integer>-30</integer>
     </dict>
     <key>W</key>
     <dict>
       <key>A</key>
       <integer>-70</integer>
-      <key>a</key>
-      <integer>-30</integer>
-      <key>ae</key>
-      <integer>-30</integer>
     </dict>
     <key>Y</key>
     <dict>
@@ -121,37 +100,10 @@
       <key>y</key>
       <integer>-30</integer>
     </dict>
-    <key>ae</key>
-    <dict>
-      <key>A</key>
-      <integer>-30</integer>
-      <key>AE</key>
-      <integer>-30</integer>
-      <key>I</key>
-      <integer>-35</integer>
-      <key>IJ</key>
-      <integer>-35</integer>
-      <key>X</key>
-      <integer>-30</integer>
-      <key>Z</key>
-      <integer>-35</integer>
-    </dict>
     <key>e</key>
     <dict>
-      <key>A</key>
-      <integer>-30</integer>
-      <key>AE</key>
-      <integer>-30</integer>
-      <key>I</key>
-      <integer>-35</integer>
-      <key>IJ</key>
-      <integer>-35</integer>
-      <key>X</key>
-      <integer>-30</integer>
-      <key>Z</key>
-      <integer>-40</integer>
       <key>x</key>
-      <integer>-35</integer>
+      <integer>-25</integer>
     </dict>
     <key>k</key>
     <dict>
@@ -175,24 +127,10 @@
       <key>x</key>
       <integer>-10</integer>
     </dict>
-    <key>oe</key>
-    <dict>
-      <key>a</key>
-      <integer>-30</integer>
-      <key>ae</key>
-      <integer>-30</integer>
-    </dict>
     <key>p</key>
     <dict>
       <key>t</key>
       <integer>-20</integer>
-    </dict>
-    <key>r</key>
-    <dict>
-      <key>a</key>
-      <integer>-35</integer>
-      <key>ae</key>
-      <integer>-35</integer>
     </dict>
     <key>tt</key>
     <dict>
@@ -206,23 +144,9 @@
     <key>v</key>
     <dict>
       <key>a</key>
-      <integer>-50</integer>
-      <key>ae</key>
       <integer>-30</integer>
       <key>e</key>
       <integer>-10</integer>
-    </dict>
-    <key>w</key>
-    <dict>
-      <key>a</key>
-      <integer>-30</integer>
-      <key>ae</key>
-      <integer>-30</integer>
-    </dict>
-    <key>y</key>
-    <dict>
-      <key>ae</key>
-      <integer>-30</integer>
     </dict>
   </dict>
 </plist>

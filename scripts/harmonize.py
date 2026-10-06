@@ -9,6 +9,7 @@ Inter'in Regular→Black aralığı nokta nokta doğrusal olduğu için (ölçü
 x ve y koordinatları Regular ve Black arasında birbirinden bağımsız interpole edilebiliyor.
 """
 
+import copy
 import json
 import shutil
 import sys
@@ -23,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from geom import bounds, contours_of, runs_at_x, runs_at_y  # noqa: E402
 from kerning import adjust as adjust_kerning, optical_gap  # noqa: E402
 from terminals import (  # noqa: E402
-    find_terminals, make_vertical, make_vertical_at, sen_cut_lengths, terminal_rel_x,
+    _outer_is_in, find_terminals, make_vertical, make_vertical_at, sen_cut_lengths, terminal_rel_x,
 )
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -33,6 +34,11 @@ INTER_XH = 1118
 # ExtraBold'da kesik yeri Regular'daki göreli konumdan alınır, uzunluğu Sen'inkinin bu katıdır.
 TERMINAL_K_REGULAR = 1.25
 TERMINAL_K_EXTRABOLD = 1.0
+# Kesimin yeri: 0 = Sen'deki kadar kısa (k ile bulunan konum), 1 = Inter'in orijinal uç noktası.
+# Aradaki değerlerde iç kenar dış kenara paralel uzatılır, kesik uzunluğu sabit kalır.
+TERMINAL_LENGTH = 0.5
+# ExtraBold'da aynı ölçek: 0 = Regular'ın kısa kesim konumu (göreli), 1 = Inter'in uç noktası.
+TERMINAL_LENGTH_EXTRABOLD = 0.25
 # æ iki bölmeli ve sıkışık; Black ötesine ekstrapolasyon a ile e arasındaki boşlukları kapatıyor.
 AE_TY_CAP = 1.2
 # Boşluk düzeltmesi bu nötr harflere göre yapılır (kerning gerektirmeyen ortaklar).
@@ -303,19 +309,38 @@ def _clear_profile_cache():
     kerning._PROFILE_CACHE.clear()
 
 
+def _outer_tip_x(g, ci, i):
+    pts = g.contours[ci].points
+    N = len(pts)
+    C_in = [(pts[(i - 3 + k) % N].x, pts[(i - 3 + k) % N].y) for k in range(4)]
+    C_out = [(pts[(i + 1 + k) % N].x, pts[(i + 1 + k) % N].y) for k in range(4)]
+    return C_in[3][0] if _outer_is_in(C_in, C_out) else C_out[0][0]
+
+
 def apply_terminals(g, master, cuts, term_rel, scale=1.0):
-    """Glifin açılı terminallerini Sen gibi dik keser (bkz. terminals.py)."""
+    """Glifin açılı terminallerini Sen gibi dik keser (bkz. terminals.py).
+
+    Kısa kesim konumu Regular'da k katsayısıyla bulunur; ExtraBold bu konumu göreli olarak alır.
+    TERMINAL_LENGTH(_EXTRABOLD) kesimi bu konumdan Inter'in orijinal uç noktasına doğru kaydırır.
+    """
     ys = [p.y for c in g.contours for p in c.points if p.type]
+    xs = [p.x for c in g.contours for p in c.points if p.type]
     mid = (max(ys) + min(ys)) / 2
+    x0, w = min(xs), max(xs) - min(xs)
     for k, (ci, i) in enumerate(find_terminals(g)):
         kind = "top" if g.contours[ci].points[i].y > mid else "bottom"
         key = (g.name, k)
+        x_outer = _outer_tip_x(g, ci, i)
         if master == "Regular":
-            make_vertical(g, ci, i, TERMINAL_K_REGULAR * cuts[kind] * scale)
-            term_rel[key] = terminal_rel_x(g, ci, i)
+            x_trim, cut = make_vertical(copy.deepcopy(g), ci, i, TERMINAL_K_REGULAR * cuts[kind] * scale)
+            term_rel[key] = (x_trim - x0) / w
+            if TERMINAL_LENGTH:
+                make_vertical_at(g, ci, i, x_trim + TERMINAL_LENGTH * (x_outer - x_trim), cut)
+            else:
+                make_vertical(g, ci, i, TERMINAL_K_REGULAR * cuts[kind] * scale)
         else:
-            xs = [p.x for c in g.contours for p in c.points if p.type]
-            X = min(xs) + term_rel[key] * (max(xs) - min(xs))
+            x_trim = x0 + term_rel[key] * w
+            X = x_trim + TERMINAL_LENGTH_EXTRABOLD * (x_outer - x_trim)
             make_vertical_at(g, ci, i, X, round(TERMINAL_K_EXTRABOLD * cuts[kind] * scale))
 
 

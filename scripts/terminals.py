@@ -137,8 +137,8 @@ def make_vertical_at(glyph, contour_index, i, X, cut):
     """Terminali verilen X'te, `cut` uzunluğunda dik keser.
 
     Dış kenar X'e kadar kısaltılır/uzatılır. İç kenarın uç noktası dış kenardan `cut` kadar
-    içeri konur; ilk tutamacı dış kenarın o noktadaki yönüne paralel çevrilir, böylece kuyruk
-    iç kenar kısa kalsa bile dış kenarla aynı akışta biter. Nokta sayısı değişmez.
+    içeri konur; tutamacı dış kenarın yönü ile iç kenarın kendi yönünün ortasına çevrilir, böylece
+    kuyruk iç kenar kısa kalsa bile kırıksız biter. Nokta sayısı değişmez.
     """
     c = glyph.contours[contour_index]
     pts = c.points
@@ -162,13 +162,30 @@ def make_vertical_at(glyph, contour_index, i, X, cut):
     ys = [p.y for cc in glyph.contours for p in cc.points if p.type]
     sign = -1 if tip[1] > (max(ys) + min(ys)) / 2 else 1  # üst uçta iç kenar aşağıda
     inner_tip = (X, tip[1] + sign * cut)
-    dn = math.hypot(*d) or 1
+
+    def unit(v):
+        n = math.hypot(*v) or 1
+        return (v[0] / n, v[1] / n)
+
+    # iç kenarın ucundaki yön: dış kenarın yönü ile iç kenarın kendi orijinal yönünün ortası;
+    # yalnızca dış kenarı izlemek uç dik yükselirken iç kenarda kırık yaratıyor
     if outer_is_in:
-        hl = 0.4 * math.hypot(inner[3][0] - inner_tip[0], inner[3][1] - inner_tip[1])
-        new_inner = (inner_tip, (inner_tip[0] + d[0] / dn * hl, inner_tip[1] + d[1] / dn * hl), inner[2], inner[3])
+        own = unit((inner[1][0] - inner[0][0], inner[1][1] - inner[0][1]))
+        far, far_handle = inner[3], inner[2]
     else:
-        hl = 0.4 * math.hypot(inner[0][0] - inner_tip[0], inner[0][1] - inner_tip[1])
-        new_inner = (inner[0], inner[1], (inner_tip[0] + d[0] / dn * hl, inner_tip[1] + d[1] / dn * hl), inner_tip)
+        own = unit((inner[2][0] - inner[3][0], inner[2][1] - inner[3][1]))
+        far, far_handle = inner[0], inner[1]
+    od = unit(d)
+    du = unit((od[0] + own[0], od[1] + own[1]))
+    dist = math.hypot(far[0] - inner_tip[0], far[1] - inner_tip[1])
+    tip_h = (inner_tip[0] + du[0] * 0.4 * dist, inner_tip[1] + du[1] * 0.4 * dist)
+    # karşı uçtaki tutamacın yönü korunur (komşu eğriyle süreklilik), boyu mesafeye oranlanır
+    fu = unit((far_handle[0] - far[0], far_handle[1] - far[1]))
+    far_h = (far[0] + fu[0] * 0.4 * dist, far[1] + fu[1] * 0.4 * dist)
+    if outer_is_in:
+        new_inner = (inner_tip, tip_h, far_h, far)
+    else:
+        new_inner = (far, far_h, tip_h, inner_tip)
     new_in, new_out = (new_outer, new_inner) if outer_is_in else (new_inner, new_outer)
     for k, p in zip(idx_in, new_in):
         pts[k].x, pts[k].y = round(p[0]), round(p[1])
