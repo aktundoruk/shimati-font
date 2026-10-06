@@ -29,11 +29,13 @@ PARA_2 = (
 )
 CHANGES = [
     ("a, e, æ, ª", "Inter’den; Sen’in genişlik, kalınlık ve boşluk sistemine uyarlandı. a’nın ucu Sen gibi dik kesik, e’ninki Inter’in açılı ucu."),
-    ("I, ı, i", "Inter gibi düz çubuk: I’nın serifleri ve ı/i’nin bayrağı kalktı. ı’nın sağ boşluğu n’ninkine eşitlendi."),
+    ("I, ı, i", "Inter gibi düz çubuk: I’nın serifleri ve ı/i’nin bayrağı kalktı. ı’nın sağ boşluğu n’ninkine eşitlendi. Serifli I isteğe bağlı: cv08."),
     ("Ç ç Ş ş", "Sen’in C S c s’si korundu; çengel Inter’den, daha kısa (240 → 187 birim)."),
     ("J, j", "Inter’den: J taban çizgisine oturan çanaklı biçim, j bayraksız ve kuyruğu Sen’in alt uzantısına iniyor. Kerning Inter’in kendi J/j çiftlerinden."),
     ("i j İ noktası", "Inter’in oranında, daha küçük; Sen’deki iki farklı nokta tek noktaya indi."),
     ("Ğ ğ", "Kısa şapka Inter’den: daha ince ve narin."),
+    ("₺, Ŋ ŋ", "₺ eklendi (Inter’den, rakam genişliğinde). Ŋ ve ŋ’nin kancası yeni j’nin kuyruğu."),
+    ("e, æ, a kalın", "ExtraBold’da e/æ kuyruğundaki yarık açıldı, æ’nin tepe çentiği yumuşatıldı, a’nın alt kasesi açıldı."),
     ("Genişlik", "Tüm harfler gövde kalınlığı korunarak %8 daraltıldı; Regular’da aralık her yandan 8 birim sıkıştırıldı."),
 ]
 
@@ -190,6 +192,11 @@ aside.note h3{{margin:0 0 8px;font-size:18px;font-variation-settings:'wght' calc
   <p class="sec-title">Türkçe karakterler</p>
   <div class="glyphs"><span class="lc">ÇĞIİÖŞÜ</span><span class="lc">çğıiöşü</span></div>
   <p class="pangram">Pijamalı hasta yağız şoföre çabucak güvendi.</p>
+  <p class="pangram">Toplam: 1.250,00 ₺ · KDV dahil 1.475,00 ₺</p>
+  <div class="compare" style="margin-top:24px">
+    <div><span class="tag sys">Varsayılan</span><p class="pangram" style="margin-top:6px">Il1 · ID · İZMİR · Illinois</p></div>
+    <div><span class="tag sys">cv08 (serifli I)</span><p class="pangram" style="margin-top:6px;font-feature-settings:'cv08'">Il1 · ID · İZMİR · Illinois</p></div>
+  </div>
 </section>
 
 <section>

@@ -86,22 +86,38 @@
     <string>H_bar.glif</string>
     <key>I</key>
     <string>I_.glif</string>
+    <key>I.cv08</key>
+    <string>I_.cv08.glif</string>
     <key>IJ</key>
     <string>I_J_.glif</string>
     <key>Iacute</key>
     <string>I_acute.glif</string>
+    <key>Iacute.cv08</key>
+    <string>I_acute.cv08.glif</string>
     <key>Icircumflex</key>
     <string>I_circumflex.glif</string>
+    <key>Icircumflex.cv08</key>
+    <string>I_circumflex.cv08.glif</string>
     <key>Idieresis</key>
     <string>I_dieresis.glif</string>
+    <key>Idieresis.cv08</key>
+    <string>I_dieresis.cv08.glif</string>
     <key>Idotaccent</key>
     <string>I_dotaccent.glif</string>
+    <key>Idotaccent.cv08</key>
+    <string>I_dotaccent.cv08.glif</string>
     <key>Igrave</key>
     <string>I_grave.glif</string>
+    <key>Igrave.cv08</key>
+    <string>I_grave.cv08.glif</string>
     <key>Imacron</key>
     <string>I_macron.glif</string>
+    <key>Imacron.cv08</key>
+    <string>I_macron.cv08.glif</string>
     <key>Iogonek</key>
     <string>I_ogonek.glif</string>
+    <key>Iogonek.cv08</key>
+    <string>I_ogonek.cv08.glif</string>
     <key>J</key>
     <string>J_.glif</string>
     <key>K</key>
@@ -490,6 +506,8 @@
     <string>less.glif</string>
     <key>lessequal</key>
     <string>lessequal.glif</string>
+    <key>liraTurkish</key>
+    <string>liraT_urkish.glif</string>
     <key>logicalnot</key>
     <string>logicalnot.glif</string>
     <key>lslash</key>

@@ -24,6 +24,7 @@ SAMPLES = [
     ("Çiçek Şeker çay şiş ÇAĞ ŞİŞ", 56),
     ("İğne bilgi ığdır DOĞU İNCİ iyi", 56),
     ("Jale jöle Japon TJ FJ PJ ij gj", 56),
+    ("1.250 ₺ Ŋŋ æ AVA vvw Qj", 56),
     ("ä â á à ã å ā ą æ é è ê ë ē ė ę ě œ", 44),
 ]
 PARAGRAPH = (

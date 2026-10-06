@@ -20,6 +20,8 @@
       <integer>-100</integer>
       <key>Y</key>
       <integer>-130</integer>
+      <key>a</key>
+      <integer>5</integer>
       <key>o</key>
       <integer>-55</integer>
       <key>v</key>
@@ -48,6 +50,13 @@
       <key>ae</key>
       <integer>10</integer>
     </dict>
+    <key>I.cv08</key>
+    <dict>
+      <key>C</key>
+      <integer>5</integer>
+      <key>O</key>
+      <integer>5</integer>
+    </dict>
     <key>J</key>
     <dict>
       <key>A</key>
@@ -62,7 +71,7 @@
       <key>Y</key>
       <integer>-35</integer>
       <key>a</key>
-      <integer>-25</integer>
+      <integer>-20</integer>
       <key>e</key>
       <integer>-45</integer>
       <key>o</key>
@@ -102,6 +111,11 @@
       <integer>-50</integer>
       <key>ae</key>
       <integer>-45</integer>
+    </dict>
+    <key>Q</key>
+    <dict>
+      <key>j</key>
+      <integer>30</integer>
     </dict>
     <key>R</key>
     <dict>
@@ -154,6 +168,8 @@
       <integer>-55</integer>
       <key>O</key>
       <integer>-35</integer>
+      <key>a</key>
+      <integer>5</integer>
     </dict>
     <key>Y</key>
     <dict>
@@ -177,12 +193,22 @@
       <key>v</key>
       <integer>-30</integer>
       <key>y</key>
-      <integer>-35</integer>
+      <integer>-25</integer>
     </dict>
     <key>b</key>
     <dict>
       <key>t</key>
       <integer>-20</integer>
+    </dict>
+    <key>c</key>
+    <dict>
+      <key>a</key>
+      <integer>10</integer>
+    </dict>
+    <key>ccedilla</key>
+    <dict>
+      <key>a</key>
+      <integer>10</integer>
     </dict>
     <key>e</key>
     <dict>
@@ -206,7 +232,7 @@
     <key>k</key>
     <dict>
       <key>a</key>
-      <integer>-20</integer>
+      <integer>-15</integer>
       <key>c</key>
       <integer>-35</integer>
       <key>e</key>
@@ -249,9 +275,19 @@
       <key>a</key>
       <integer>-60</integer>
       <key>ae</key>
-      <integer>-55</integer>
+      <integer>-50</integer>
       <key>j</key>
       <integer>15</integer>
+    </dict>
+    <key>s</key>
+    <dict>
+      <key>a</key>
+      <integer>10</integer>
+    </dict>
+    <key>scedilla</key>
+    <dict>
+      <key>a</key>
+      <integer>10</integer>
     </dict>
     <key>t</key>
     <dict>
@@ -303,6 +339,8 @@
     </dict>
     <key>x</key>
     <dict>
+      <key>a</key>
+      <integer>10</integer>
       <key>c</key>
       <integer>-45</integer>
       <key>d</key>
@@ -315,6 +353,8 @@
       <integer>-35</integer>
       <key>t</key>
       <integer>-10</integer>
+      <key>x</key>
+      <integer>5</integer>
     </dict>
     <key>y</key>
     <dict>
@@ -322,6 +362,11 @@
       <integer>-55</integer>
       <key>o</key>
       <integer>-20</integer>
+    </dict>
+    <key>z</key>
+    <dict>
+      <key>a</key>
+      <integer>5</integer>
     </dict>
   </dict>
 </plist>

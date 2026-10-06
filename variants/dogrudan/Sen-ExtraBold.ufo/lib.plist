@@ -457,6 +457,7 @@
       <string>cedilla</string>
       <string>ogonek</string>
       <string>tt</string>
+      <string>liraTurkish</string>
     </array>
     <key>public.postscriptNames</key>
     <dict>
@@ -520,6 +521,8 @@
       <string>uni0137</string>
       <key>lcommaaccent</key>
       <string>uni013C</string>
+      <key>liraTurkish</key>
+      <string>uni20BA</string>
       <key>macroncomb</key>
       <string>uni0304</string>
       <key>micro</key>

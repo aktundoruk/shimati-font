@@ -158,3 +158,41 @@ def inter_pairs(font, glyph, char, tx, sx, analog, inter_dir, round_to=5):
         font.kerning[pair] = k
         changes.append({"pair": f"{left} {right}", "inter": round(v), "new": k})
     return changes
+
+
+GUARD_LETTERS = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") + [
+    "ccedilla", "gbreve", "idotless", "odieresis", "scedilla", "udieresis",
+    "Ccedilla", "Gbreve", "Idotaccent", "Odieresis", "Scedilla", "Udieresis"]
+
+
+RESHAPED = ("J", "j", "I", "Idotaccent", "i", "idotless")
+
+
+def collision_guard(font, src, scale, reshaped=RESHAPED, min_abs=0.03, round_to=5):
+    """Son adım (daraltma ve aralık sıkıştırmadan sonra): hiçbir harf çiftinin en dar boşluğu,
+    Sen'deki boşluğun (daraltma oranıyla) %60'ının altına inmesin; inerse yalnızca o kadar pozitif
+    kerning eklenir. Şekli tamamen değişen harflerde (J, j; serifli I ve bayraklı ı/i'nin yerini alan
+    düz çubuklar) eski boşluk referans olamaz, mutlak alt sınır kullanılır (0.03 em)."""
+    _PROFILE_CACHE.clear()
+    em = font.info.unitsPerEm or 1024
+    changes = []
+    for a in GUARD_LETTERS:
+        for b in GUARD_LETTERS:
+            k = font.kerning.get((a, b), 0)
+            gn = raw_min_gap(font, a, b, k)
+            if gn is None:
+                continue
+            if a in reshaped or b in reshaped:
+                limit = min_abs * em
+            else:
+                go = raw_min_gap(src, a, b, src.kerning.get((a, b), 0))
+                limit = 0.6 * go * scale
+            if gn >= limit:
+                continue
+            k_new = k
+            while raw_min_gap(font, a, b, k_new) < limit:
+                k_new += round_to
+            font.kerning[(a, b)] = k_new
+            changes.append(f"{a} {b} {k}→{k_new}")
+    _PROFILE_CACHE.clear()
+    return changes

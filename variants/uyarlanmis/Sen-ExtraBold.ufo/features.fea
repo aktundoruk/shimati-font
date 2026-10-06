@@ -110,3 +110,15 @@ feature cpsp {
 pos @Uppercase <5 0 10 0>;
 
 } cpsp;
+
+# Serifli I (Sen'in orijinal I'sı), Inter'deki cv08 gibi
+feature cv08 {
+  sub I by I.cv08;
+  sub Iacute by Iacute.cv08;
+  sub Icircumflex by Icircumflex.cv08;
+  sub Idieresis by Idieresis.cv08;
+  sub Idotaccent by Idotaccent.cv08;
+  sub Igrave by Igrave.cv08;
+  sub Imacron by Imacron.cv08;
+  sub Iogonek by Iogonek.cv08;
+} cv08;

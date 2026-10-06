@@ -124,7 +124,25 @@
      "rsb": 70,
      "width": 222,
      "bottom": -187
+    },
+    "tails": {
+     "eng": {
+      "inter_weight_x": 408,
+      "stem": 82
+     },
+     "Eng": {
+      "inter_weight_x": 408,
+      "stem": 90
+     }
     }
+   },
+   "lira": {
+    "inter_weight_x": 408,
+    "inter_weight_y": 408,
+    "scale_x": 0.4497,
+    "lsb": 44,
+    "rsb": 55,
+    "width": 549
    },
    "a": {
     "inter_weight_x": 408,
@@ -310,7 +328,25 @@
      "rsb": 49,
      "width": 270,
      "bottom": -191
+    },
+    "tails": {
+     "eng": {
+      "inter_weight_x": 844,
+      "stem": 173
+     },
+     "Eng": {
+      "inter_weight_x": 844,
+      "stem": 187
+     }
     }
+   },
+   "lira": {
+    "inter_weight_x": 844,
+    "inter_weight_y": 844,
+    "scale_x": 0.4497,
+    "lsb": 53,
+    "rsb": 45,
+    "width": 623
    },
    "a": {
     "inter_weight_x": 844,
@@ -498,7 +534,25 @@
      "rsb": 70,
      "width": 236,
      "bottom": -240
+    },
+    "tails": {
+     "eng": {
+      "inter_weight_x": 407,
+      "stem": 82
+     },
+     "Eng": {
+      "inter_weight_x": 446,
+      "stem": 90
+     }
     }
+   },
+   "lira": {
+    "inter_weight_x": 404,
+    "inter_weight_y": 449,
+    "scale_x": 0.4694,
+    "lsb": 41,
+    "rsb": 41,
+    "width": 550
    },
    "a": {
     "inter_weight_x": 373,
@@ -570,6 +624,11 @@
      7
     ]
    },
+   "tail_angle": {},
+   "ae_notch": [
+    81,
+    26
+   ],
    "ordfeminine": {
     "inter_weight_x": 340,
     "inter_weight_y": 505,
@@ -742,6 +801,16 @@
      "inter": 20,
      "new": 10
     }
+   ],
+   "cv08": [
+    "I",
+    "Iacute",
+    "Icircumflex",
+    "Idieresis",
+    "Idotaccent",
+    "Igrave",
+    "Imacron",
+    "Iogonek"
    ]
   },
   "ExtraBold": {
@@ -868,11 +937,29 @@
      "rsb": 65,
      "width": 307,
      "bottom": -240
+    },
+    "tails": {
+     "eng": {
+      "inter_weight_x": 849,
+      "stem": 173
+     },
+     "Eng": {
+      "inter_weight_x": 918,
+      "stem": 187
+     }
     }
+   },
+   "lira": {
+    "inter_weight_x": 1069,
+    "inter_weight_y": 1105,
+    "scale_x": 0.397,
+    "lsb": 51,
+    "rsb": 51,
+    "width": 600
    },
    "a": {
     "inter_weight_x": 866,
-    "inter_weight_y": 1122,
+    "inter_weight_y": 940,
     "scale_x": 0.4443,
     "scale_y": 0.4562,
     "width": 569,
@@ -880,7 +967,7 @@
     "rsb": 70,
     "bbox": [
      28,
-     -12,
+     -13,
      499,
      525
     ],
@@ -890,13 +977,13 @@
     ],
     "measured": {
      "stem@0.4xh": [
-      267,
+      221,
       171
      ],
      "vruns@center": [
-      130,
-      114,
-      158
+      111,
+      104,
+      139
      ]
     }
    },
@@ -931,7 +1018,7 @@
    },
    "ae": {
     "inter_weight_x": 870,
-    "inter_weight_y": 1000,
+    "inter_weight_y": 940,
     "scale_x": 0.4544,
     "width": 852,
     "points": [
@@ -940,6 +1027,20 @@
      7
     ]
    },
+   "tail_angle": {
+    "e": [
+     8.5,
+     30.0
+    ],
+    "ae": [
+     0.7,
+     30.0
+    ]
+   },
+   "ae_notch": [
+    46,
+    25
+   ],
    "ordfeminine": {
     "inter_weight_x": 916,
     "inter_weight_y": 1217,
@@ -964,15 +1065,15 @@
    "spacing": {
     "a": {
      "lsb": -8,
-     "rsb": -11
+     "rsb": -10
     },
     "e": {
      "lsb": 0,
-     "rsb": 0
+     "rsb": -10
     },
     "ae": {
      "lsb": -8,
-     "rsb": 0
+     "rsb": -11
     }
    },
    "kerning": [
@@ -1039,7 +1140,7 @@
     {
      "pair": "a y",
      "old": 0,
-     "new": -35,
+     "new": -30,
      "existed": false
     },
     {
@@ -1051,7 +1152,7 @@
     {
      "pair": "r ae",
      "old": 0,
-     "new": -50,
+     "new": -45,
      "existed": false
     }
    ],
@@ -1146,6 +1247,16 @@
      "inter": 11,
      "new": 5
     }
+   ],
+   "cv08": [
+    "I",
+    "Iacute",
+    "Icircumflex",
+    "Idieresis",
+    "Idotaccent",
+    "Igrave",
+    "Imacron",
+    "Iogonek"
    ]
   },
   "condense": {
@@ -1175,6 +1286,90 @@
   "tracking": {
    "Regular": 8,
    "ExtraBold": 0
+  },
+  "collision_guard": {
+   "Regular": [
+    "c a 0→5",
+    "f w 0→5",
+    "f V 0→5",
+    "f W 0→10",
+    "f X 0→5",
+    "f Y 0→5",
+    "k a -10→0",
+    "k w 0→5",
+    "k x 0→10",
+    "k A 0→10",
+    "k X 0→10",
+    "r v 0→5",
+    "r w 0→5",
+    "r y 0→5",
+    "t a 0→5",
+    "v v 0→5",
+    "v w 0→5",
+    "v x 0→5",
+    "v y 0→5",
+    "w v 0→5",
+    "w w 0→5",
+    "w x 0→5",
+    "w y 0→5",
+    "x v 0→5",
+    "x w 0→5",
+    "x x 0→10",
+    "x y 0→5",
+    "x A 0→10",
+    "x X 0→10",
+    "y v 0→5",
+    "y w 0→5",
+    "y x 0→5",
+    "y y 0→5",
+    "z a 0→5",
+    "A a 0→5",
+    "A x 0→10",
+    "A A 0→10",
+    "A X 0→10",
+    "K x 0→10",
+    "K A 0→10",
+    "K X 0→10",
+    "L a 0→5",
+    "R x 0→5",
+    "R A 0→5",
+    "R X 0→5",
+    "V V 0→5",
+    "V W 0→10",
+    "V X 0→5",
+    "V Y 0→5",
+    "W V 0→10",
+    "W W 0→10",
+    "W X 0→5",
+    "W Y 0→5",
+    "X a 0→5",
+    "X x 0→10",
+    "X A 0→10",
+    "X V 0→5",
+    "X W 0→5",
+    "X X 0→10",
+    "X Y 0→5",
+    "Y V 0→5",
+    "Y W 0→5",
+    "Y X 0→5",
+    "Y Y 0→5",
+    "Z a 0→5",
+    "ccedilla a 0→5"
+   ],
+   "ExtraBold": [
+    "c a 0→10",
+    "k a -20→-15",
+    "s a 0→10",
+    "x a 0→10",
+    "x x 0→5",
+    "z a 0→5",
+    "A a 0→5",
+    "K a -25→-20",
+    "Q j 0→30",
+    "X a 0→5",
+    "ccedilla a 0→10",
+    "scedilla a 0→10"
+   ]
   }
  }
 }

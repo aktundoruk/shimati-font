@@ -77,19 +77,26 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
   zaten yeterince kıstığı için 0.
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
+## Çözülen açık konular (6 Ekim 2026)
+
+- **`₺`** eklendi (`build_lira`): Inter'den; gövde Sen `L`'sine, alt kavis `U`'suna; ölçek Sen/Inter rakam
+  oranından; genişlik Sen'in tablo rakamlarınınki (550 / 600), mürekkep ortalı.
+- **`I` / `l` / `1` ayrımı**: varsayılan düz `I` kalır; Sen'in orijinal serifli `I`'sı (ve `Í Î Ï İ Ì Ī Į`)
+  `.cv08` olarak eklendi, `cv08` özelliğiyle açılır (Inter'deki gibi). CSS: `font-feature-settings: 'cv08'`.
+- **`Ŋ ŋ`** (`build_eng_tails`): Sen'in `N`/`n` gövdesi korunur, kanca yeni `j`'nin kuyruğu (Inter `ȷ`), aynı
+  gövde genişliği ve alt uzantı. (Inter'in kendi `Ŋ`'si Regular/Black arasında nokta-uyumsuz.)
+- **`e` / `æ` kuyruğu (ExtraBold)**: kesik çok yatıktı (8.6° / 0.7°), kuyruğun üstü çubuğun altında uzun bir
+  yarık yapıyordu. İç uç sabit, dış kenar kısaltılarak kesik 30°'ye dikleştirildi (`steepen_terminal`).
+  Regular'a (14.7°) dokunulmadı.
+- **`æ` tepe çentiği**: Regular 81, ExtraBold 46 birim derinlikteki V, 25 birime indirildi (yalnızca çukur
+  noktası kalkar, kontrol noktaları yerinde; yoksa tepe çizgisini aşan tümsek oluşuyor).
+- **ExtraBold `a`'nın alt kasesi**: yatay çizgiler Sen `o`'su (165) yerine Sen `e`'sine (142) eşitlendi;
+  Inter y ağırlığı 1122 → 940, kasenin içi ~68 → ~91 birim. Regular değişmedi (o ve e aynı: 80).
+- **Kerning denetimi** (`scripts/kern_audit.py`): Regular'daki aralık sıkıştırma çapraz harfleri (AA, vv, XX)
+  değecek kadar yaklaştırıyordu; ExtraBold'da `c a`, `s a`, `Q j` çarpışıyordu. Son adımda çarpışma koruması
+  (`kerning.collision_guard`): en dar boşluk Sen'dekinin %60'ının altına inerse yalnızca o kadar pozitif
+  kerning (çoğu +5/+10). Şekli değişen `I ı i J j` için eski boşluk referans olamaz, mutlak alt sınır 0.03 em.
+
 ## Açık konular
 
-- **`₺` yok**: Sen'de Türk lirası işareti (U+20BA) bulunmuyor, tarayıcı sistem fontuna düşüyor. Tasarım
-  sistemi için eklenmeli (Inter'den uyarlanabilir).
-
-- **`I` / `l` / `1` ayrımı**: `I` ve `l` artık ikisi de düz çubuk, yalnızca boyları farklı (670 / 720).
-  Arayüzde (kodlar, şifreler, "Il") karışabilir. Inter bu yüzden serifli `I` seçeneği sunuyor (cv08).
-- **`Ŋ`**: Sen'in eski `J` kancasını koruyor; yeni `J`/`j` ile uyumu gözden geçirilmeli.
-
-- **`e`'nin ağzı**: Sen'inkinden ~%25 kapalı (Regular 80 / 108, ExtraBold 47 / 66 birim). ExtraBold'da açılı
-  kesik orta çizgiye paralel uzandığı için büyük boyutta yarık gibi görünüyor.
-- **æ tepe birleşimi**: Inter'in tasarımından gelen küçük V çentiği ExtraBold'da belirgin.
-- **ExtraBold yatay kalınlık**: Sen'e eşitlemek için Inter Black'in ötesine ~%45 ekstrapolasyon gerekti (y ağırlığı ≈1122).
-  `a`'nın alt iç boşluğu bu yüzden dar.
-- **Kerning gözden geçirme**: otomatik çiftler (`build/olcumler.json` → `kerning`)
-  gerçek metinde kontrol edilmeli.
+- Gerçek arayüz metinlerinde (küçük boyut, ekran) gözle kontrol; özellikle 12–14 px'te `cv08` gerekip gerekmediği.

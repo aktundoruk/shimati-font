@@ -226,3 +226,104 @@ def sen_cut_lengths(sen):
                     if (kind == "top") == (min(p.y, q.y) > mid):
                         out[kind] = abs(p.y - q.y)
     return out
+
+
+def _bottom_terminal(glyph):
+    """Alt yarıdaki terminal (dik ya da açılı): (kontur, i) — i ile i+1 arası, iki yanı eğri."""
+    ys = [p.y for c in glyph.contours for p in c.points if p.type]
+    mid = (max(ys) + min(ys)) / 2
+    found = []
+    for ci, c in enumerate(glyph.contours):
+        pts = c.points
+        N = len(pts)
+        for i, p in enumerate(pts):
+            q = pts[(i + 1) % N]
+            if p.type and q.type == "line" and pts[i - 1].type is None and pts[(i + 2) % N].type is None \
+                    and max(p.y, q.y) < mid and abs(q.y - p.y) + abs(q.x - p.x) > 0:
+                found.append((p.x + q.x, ci, i))
+    # birden çoksa (æ) en sağdaki: e'nin kuyruğu
+    return max(found)[1:] if found else None
+
+
+def steepen_terminal(glyph, min_deg):
+    """Alt terminalin kesiğini en az `min_deg` derece dikleştirir (e'nin kuyruğu).
+
+    İç uç yerinde kalır; dış kenar, iç uçtan bu açıyla inen doğruyla kesiştiği yerde kısaltılır.
+    Yatık bir kesik kuyruğun üst kenarını çubuğun altında uzun, dar bir yarık gibi uzatıyor;
+    dikleşince ağız sağa doğru açılır. Nokta sayısı değişmez. Döndürür: (eski açı, yeni açı)."""
+    ci, i = _bottom_terminal(glyph)
+    pts = glyph.contours[ci].points
+    N = len(pts)
+    idx_in = [(i - 3 + k) % N for k in range(4)]
+    idx_out = [(i + 1 + k) % N for k in range(4)]
+    C_in = [(pts[k].x, pts[k].y) for k in idx_in]
+    C_out = [(pts[k].x, pts[k].y) for k in idx_out]
+    oin = _outer_is_in(C_in, C_out)
+    outer = C_in if oin else C_out
+    i_tip = C_out[0] if oin else C_in[3]
+    o_tip = outer[3] if oin else outer[0]
+    old = math.degrees(math.atan2(abs(o_tip[1] - i_tip[1]), abs(o_tip[0] - i_tip[0])))
+    if old >= min_deg:
+        return round(old, 1), round(old, 1)
+    sx = 1 if o_tip[0] > i_tip[0] else -1
+    d = (sx * math.cos(math.radians(min_deg)), -math.sin(math.radians(min_deg)))
+
+    def side(t):
+        p = _pt(outer, t)
+        return (p[0] - i_tip[0]) * d[1] - (p[1] - i_tip[1]) * d[0]
+
+    t = _solve_side(side, 1.0 if oin else 0.0)
+    new = _split(outer, t)[0] if oin else _split(outer, t)[1]
+    for k, p in zip(idx_in if oin else idx_out, new):
+        pts[k].x, pts[k].y = round(p[0]), round(p[1])
+    tip = new[3] if oin else new[0]
+    return round(old, 1), round(math.degrees(math.atan2(abs(tip[1] - i_tip[1]), abs(tip[0] - i_tip[0]))), 1)
+
+
+def _solve_side(side, ref, steps=400):
+    """side(t) = 0 kökü, [0, 1]'de `ref`'e en yakını."""
+    ts = [k / steps for k in range(steps + 1)]
+    brackets = [(a, b) for a, b in zip(ts, ts[1:]) if (side(a) < 0) != (side(b) < 0)]
+    a, b = min(brackets, key=lambda ab: abs((ab[0] + ab[1]) / 2 - ref))
+    for _ in range(50):
+        m = (a + b) / 2
+        a, b = (m, b) if (side(a) < 0) == (side(m) < 0) else (a, m)
+    return (a + b) / 2
+
+
+def top_notch(glyph, contours_of, runs_at_x):
+    """Üst kenarda iki tepe arasındaki çukur: (kontur, nokta, derinlik) ya da None.
+
+    Üst zarf (her x'te en yüksek mürekkep) taranır; iki yanındaki tepelerden alçak en derin yer
+    çukurdur. Çukura en yakın düğüm noktası döndürülür."""
+    P = contours_of(glyph)
+    xs = [p[0] for poly in P for p in poly]
+    x0, x1 = int(min(xs)) + 2, int(max(xs)) - 2
+    env = []
+    for x in range(x0, x1, 2):
+        r = runs_at_x(P, x)
+        if r:
+            env.append((x, r[-1][1]))
+    best = None
+    for j in range(1, len(env) - 1):
+        x, y = env[j]
+        lmax = max(v for _, v in env[:j])
+        rmax = max(v for _, v in env[j + 1:])
+        depth = min(lmax, rmax) - y
+        # yalnızca tepenin yakınındaki çukurlar (yan kenarlardaki iniş sayılmaz)
+        if depth > 0 and y > max(v for _, v in env) * 0.7 and (best is None or depth > best[2]):
+            best = (x, y, depth)
+    if best is None:
+        return None
+    bx, by, depth = best
+    ci, k = min(((ci, k) for ci, c in enumerate(glyph.contours) for k, p in enumerate(c.points) if p.type),
+                key=lambda ck: math.hypot(glyph.contours[ck[0]].points[ck[1]].x - bx,
+                                          glyph.contours[ck[0]].points[ck[1]].y - by))
+    return ci, k, depth
+
+
+def raise_notch(glyph, ci, k, dy):
+    """Çukur noktasını dy kadar yukarı taşır; komşu kontrol noktaları yerinde kalır (onlar da
+    taşınınca eğri tepe çizgisinin üstüne tümsek yapıyor)."""
+    p = glyph.contours[ci].points[k]
+    p.y = round(p.y + dy)

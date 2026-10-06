@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="Idieresis.cv08" format="2">
+  <advance width="527"/>
+  <anchor x="344" y="10" name="ogonek"/>
+  <anchor x="263" y="885" name="top"/>
+  <outline>
+    <component base="I.cv08"/>
+    <component base="dieresiscomb" xOffset="17" yOffset="160"/>
+  </outline>
+  <lib>
+    <dict>
+      <key>public.markColor</key>
+      <string>0.67,0.95,0.38,1</string>
+    </dict>
+  </lib>
+</glyph>

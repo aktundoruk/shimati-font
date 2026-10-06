@@ -457,6 +457,15 @@
       <string>cedilla</string>
       <string>ogonek</string>
       <string>tt</string>
+      <string>liraTurkish</string>
+      <string>I.cv08</string>
+      <string>Iacute.cv08</string>
+      <string>Icircumflex.cv08</string>
+      <string>Idieresis.cv08</string>
+      <string>Idotaccent.cv08</string>
+      <string>Igrave.cv08</string>
+      <string>Imacron.cv08</string>
+      <string>Iogonek.cv08</string>
     </array>
     <key>public.postscriptNames</key>
     <dict>
@@ -520,6 +529,8 @@
       <string>uni0137</string>
       <key>lcommaaccent</key>
       <string>uni013C</string>
+      <key>liraTurkish</key>
+      <string>uni20BA</string>
       <key>macroncomb</key>
       <string>uni0304</string>
       <key>micro</key>

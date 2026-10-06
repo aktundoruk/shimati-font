@@ -23,9 +23,10 @@ from fontTools.ttLib import TTFont
 sys.path.insert(0, str(Path(__file__).parent))
 from geom import bounds, contours_of, runs_at_x, runs_at_y  # noqa: E402
 from condense import condense, track  # noqa: E402
-from kerning import adjust as adjust_kerning, inter_pairs, optical_gap  # noqa: E402
+from kerning import adjust as adjust_kerning, collision_guard, inter_pairs, optical_gap  # noqa: E402
 from terminals import (  # noqa: E402
-    _outer_is_in, find_terminals, make_vertical, make_vertical_at, sen_cut_lengths, terminal_rel_x,
+    _outer_is_in, find_terminals, make_vertical, make_vertical_at, raise_notch, sen_cut_lengths,
+    steepen_terminal, terminal_rel_x, top_notch,
 )
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,8 +44,13 @@ TERMINAL_LENGTH_EXTRABOLD = 0.25
 # Hangi uçlar dik kesilsin: "top" = a'nın (ve æ, ª'nın a kısmının) kemeri, "bottom" = e'nin kuyruğu.
 # e, Inter'in orijinal açılı ucuyla bırakılıyor.
 CUT_TERMINALS = ("top",)
+# ExtraBold'da Inter'in e kuyruğu kesiği çok yatık (e 8.6°, æ 0.7°): kuyruğun üstü çubuğun altında
+# uzun bir yarık oluşturuyor. Kesik en az bu açıya dikleştirilir (Regular 14.7°, dokunulmaz).
+TAIL_MIN_ANGLE_EXTRABOLD = 30
 # æ iki bölmeli ve sıkışık; Black ötesine ekstrapolasyon a ile e arasındaki boşlukları kapatıyor.
 AE_TY_CAP = 1.2
+# æ'nin tepesinde a ile e'nin birleştiği V çentiği (Regular 81, ExtraBold 46 birim) bu derinliğe indirilir.
+AE_NOTCH_MAX = 25
 # Daraltma: küçük harflerin ortalama genişliği bu oranda daralır, dikey gövdeler aynı kalır.
 CONDENSE = 0.92
 # Genel aralık sıkıştırma: her yan boşluktan çıkarılan birim (Regular, ExtraBold).
@@ -429,8 +435,147 @@ def build_j(sen, variant):
                        "scale": round(s, 4),
                        "stem": round(_w(stem_new)), "stem_lsb": round(stem_new[0]), "rsb": round(rsb),
                        "width": g.width, "bottom": round(ink(final)[1])}
+    log["tails"] = build_eng_tails(sen, variant, ty)
     fix_composites(sen, None, bases=("jdotless",))
     return log
+
+
+def inter_tail(sen, stem, top_y, ty, variant):
+    """Inter ȷ'sının kuyruğu, verilen gövdeye (x aralığı) ve tepe yüksekliğine oturtulmuş.
+
+    Gövde genişliği x ağırlığıyla eşlenir; kuyruk j'deki gibi Sen'in alt uzantısına iner. ȷ'nın
+    x-height'teki tepe noktaları `top_y`'ye taşınır (ŋ'de n'nin gövdesi içinde kalan kısa bir boyun)."""
+    ij = InterGlyph("ȷ")
+    xh = sen.info.xHeight
+    s = xh / INTER_XH
+    if variant == "dogrudan":
+        tx = ty = mark_weight(sen)
+    else:
+        tx = solve(lambda t: _w(runs_at_y(contours_of(ij.at(t, ty)), INTER_XH * 0.5)[-1]) * s, stem[1] - stem[0])
+    src = ij.at(tx, ty)
+    drop = ink(SenGlyph(sen, "p"))[1] - ink(src)[1] * s if variant != "dogrudan" else 0
+
+    def ymap(y):
+        if y >= INTER_XH - 1:
+            return top_y
+        return y * s if y >= 0 else y * s + drop
+
+    shaped = transform(src, s, 1, ymap, 0)
+    run = runs_at_y(contours_of(shaped), min(top_y, xh) * 0.25)[-1]
+    return transform(shaped, 1, 1, lambda y: y, stem[0] - run[0]), round(400 + tx * 500)
+
+
+def build_eng_tails(sen, variant, ty):
+    """ŋ ve Ŋ: Sen'in n / N gövdesi korunur, kancası yeni j'nin kuyruğuyla (Inter) değiştirilir."""
+    log = {}
+    xh, cap = sen.info.xHeight, sen.info.capHeight
+    # ŋ: n bileşeni + kanca konturu; kanca, n'nin sağ gövdesinin düz kısmında başlar
+    eng = sen["eng"]
+    n_stem = runs_at_y(contours_of(SenGlyph(sen, "n")), xh * 0.2)[-1]
+    tail, w = inter_tail(sen, n_stem, xh * 0.5, ty, variant)
+    eng.clearContours()
+    tail.draw(SegmentToPointPen(eng.getPointPen()))
+    log["eng"] = {"inter_weight_x": w, "stem": round(_w(n_stem))}
+    # Ŋ: N gövdesi + (konturlara çevrilmiş) eski J; J'nin yerine aynı gövde aralığında yeni kuyruk
+    Eng = sen["Eng"]
+    old = Eng.contours[-1]
+    xs = [p.x for p in old.points if p.type]
+    ys = [p.y for p in old.points if p.type]
+    oP = contours_of(OpsGlyph(_contour_ops(old)))
+    j_stem = runs_at_y(oP, cap * 0.5)[-1]
+    tail, w = inter_tail(sen, j_stem, max(ys), ty, variant)
+    Eng.contours.remove(old)
+    tail.draw(SegmentToPointPen(Eng.getPointPen()))
+    log["Eng"] = {"inter_weight_x": w, "stem": round(_w(j_stem))}
+    return log
+
+
+def _contour_ops(contour):
+    from fontTools.pens.pointPen import PointToSegmentPen
+    rec = RecordingPen()
+    contour.drawPoints(PointToSegmentPen(rec))
+    return rec.value
+
+
+def build_lira(sen, variant):
+    """₺ Inter'den: gövde Sen L'sine, alt kavis Sen U'suna; ölçek Sen/Inter rakam oranından, genişlik
+    Sen'in tablo rakamlarınınki (₺ hep rakamların yanında, tablolarda hizalı kalsın). Sen'de ₺ yoktu."""
+    ig, iU = InterGlyph("₺"), InterGlyph("U")
+    cap = sen.info.capHeight
+    s = cap / INTER_CAP
+    digits = "0123456789"
+    names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+    if variant == "dogrudan":
+        tx = ty = mark_weight(sen)
+        sx = s
+        ymap = lambda y: y  # noqa: E731
+        src = ig.at(tx, ty)
+        lsb, rsb = ink(src)[0] * s, (ig.advance(tx) - ink(src)[2]) * s
+    else:
+        sU = SenGlyph(sen, "U")
+        l_stem = _w(runs_at_y(contours_of(SenGlyph(sen, "L")), cap * 0.3)[0])
+        def curve_bottom(g):
+            # alt kavisin kalınlığı, gövdenin sağında (ink genişliğinin %60'ı)
+            x0, _, x1, _ = ink(g)
+            return _w(runs_at_x(contours_of(g), x0 + 0.6 * (x1 - x0))[0])
+
+        ty = solve(lambda t: curve_bottom(ig.at(0, t)) * s, _w(bottom_run(sU)))
+        tx, sx = 0.0, s
+        for _ in range(6):
+            ratios = []
+            for ch, nm in zip(digits, names):
+                ii = ink(InterGlyph(ch).at(tx, ty))
+                si = ink(SenGlyph(sen, nm))
+                ratios.append((si[2] - si[0]) / (ii[2] - ii[0]))
+            sx = sum(ratios) / len(ratios)
+            tx = solve(lambda t: _w(runs_at_y(contours_of(ig.at(t, ty)), INTER_CAP * 0.3)[0]) * sx, l_stem)
+        iu_bot = ink(iU.at(tx, ty))[1] * s
+        u_bot = ink(sU)[1]
+
+        def ymap(y, k=u_bot / iu_bot):
+            return y * k if y < 0 else y
+
+        src = ig.at(tx, ty)
+        # Sen'in rakamları tablo düzeninde (hepsi aynı genişlikte); ₺ da rakam genişliğinde, ortalı
+        inkw = (ink(src)[2] - ink(src)[0]) * sx
+        lsb = rsb = (sen["zero"].width - inkw) / 2
+    shaped = transform(src, sx, s, ymap, 0)
+    final = transform(shaped, 1, 1, lambda y: y, round(lsb) - ink(shaped)[0])
+    name = "liraTurkish"
+    if name not in sen:
+        sen.newGlyph(name)
+        sen.lib["public.glyphOrder"].append(name)
+        sen.lib.setdefault("public.postscriptNames", {})[name] = "uni20BA"
+    g = sen[name]
+    g.unicodes = [0x20BA]
+    write_outline(g, final)
+    g.width = round(ink(final)[2] + rsb) if variant == "dogrudan" else sen["zero"].width
+    return {"inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
+            "scale_x": round(sx, 4), "lsb": round(lsb), "rsb": round(rsb), "width": g.width}
+
+
+# Serifli I seçeneği (Inter'deki gibi cv08): Sen'in orijinal I'sı ve onu kullanan bileşikler
+CV08 = ["I", "Iacute", "Icircumflex", "Idieresis", "Idotaccent", "Igrave", "Imacron", "Iogonek"]
+
+
+def add_serif_i(sen, src):
+    """`I.cv08` ailesini Sen'in kaynağından kopyalar, kerning'ini taşır, cv08 özelliğini ekler."""
+    for n in CV08:
+        g = copy.deepcopy(src[n])
+        g.unicodes = []
+        for c in g.components:
+            if c.baseGlyph == "I":
+                c.baseGlyph = "I.cv08"
+        sen.layers.defaultLayer.insertGlyph(g, f"{n}.cv08", overwrite=True)
+        if f"{n}.cv08" not in sen.lib["public.glyphOrder"]:
+            sen.lib["public.glyphOrder"].append(f"{n}.cv08")
+    for (l, r), v in src.kerning.items():
+        if "I" in (l, r):
+            sen.kerning[(l.replace("I", "I.cv08") if l == "I" else l, r.replace("I", "I.cv08") if r == "I" else r)] = v
+    if "feature cv08" not in sen.features.text:
+        subs = "\n".join(f"  sub {n} by {n}.cv08;" for n in CV08)
+        sen.features.text += f"\n# Serifli I (Sen'in orijinal I'sı), Inter'deki cv08 gibi\nfeature cv08 {{\n{subs}\n}} cv08;\n"
+    return CV08
 
 
 def build_marks(sen):
@@ -545,8 +690,10 @@ def harmonize(variant):
         straight_log = build_straight(sen, variant)
         cedilla_log = build_cedilla(sen, variant)
         j_log = build_j(sen, variant)
+        lira_log = build_lira(sen, variant)
         marks_log = build_marks(sen)
         cuts = sen_cut_lengths(sen)
+        log_tail = {}
         params = {}
         xh = sen.info.xHeight
         sy = xh / INTER_XH
@@ -574,6 +721,7 @@ def harmonize(variant):
         log[m]["cedilla"] = cedilla_log
         log[m]["marks"] = marks_log
         log[m]["j"] = j_log
+        log[m]["lira"] = lira_log
 
         for name in "ae":
             ig = inter[name]
@@ -583,12 +731,13 @@ def harmonize(variant):
                 tx = ty = t
                 ymap = lambda y: y  # noqa: E731
             else:
-                # y: a için Inter o'sunun üst kalınlığı Sen o'sununkine; e için Inter e'sininki
-                # Sen e'sininkine eşit olsun (Sen'in e'si o'sundan ince, yoksa e'nin ağzı kapanıyor)
+                # y: yatay çizgiler Sen'in e'sinin üst kalınlığına (Sen'in e'si o'sundan ince: ExtraBold
+                # 142 / 165). e için Inter e'si, a için Inter o'su ölçülür. a'yı o'ya eşitlemek ExtraBold'da
+                # Black'in %44 ötesine gidiyor ve alt kasenin içini kapatıyordu; Regular'da ikisi aynı (80).
                 if name == "e":
                     ty = solve(lambda t: o_top(ig.at(0, t)) * sy, tgt["etop"])
                 else:
-                    ty = solve(lambda t: o_top(inter["o"].at(0, t)) * sy, tgt["otop"])
+                    ty = solve(lambda t: o_top(inter["o"].at(0, t)) * sy, tgt["etop"])
                 # x: genişlik ve dikey kalınlık birlikte çözülür
                 tx = 0.0
                 for _ in range(6):
@@ -644,6 +793,8 @@ def harmonize(variant):
             params[name] = {"tx": tx, "ty": ty, "sx": sx, "sy": sy, "ymap": ymap, "lsb": lsb, "rsb": rsb}
             if variant == "uyarlanmis":
                 apply_terminals(g, m, cuts, term_rel)
+                if name == "e" and m == "ExtraBold":
+                    log_tail[name] = steepen_terminal(g, TAIL_MIN_ANGLE_EXTRABOLD)
             (ox0, oy0, ox1, oy1), _, oanch = old[name]
             g.clearAnchors()
             for aname, (ax, ay) in oanch.items():
@@ -670,12 +821,23 @@ def harmonize(variant):
 
         if variant == "uyarlanmis":
             log[m]["ae"] = build_ae(sen, params, old["ae"], cuts, term_rel, m)
+            if m == "ExtraBold":
+                log_tail["ae"] = steepen_terminal(sen["ae"], TAIL_MIN_ANGLE_EXTRABOLD)
+            log[m]["tail_angle"] = log_tail
+            # æ tepesindeki çentik (Inter'in a ile e birleşimi): derinliği AE_NOTCH_MAX ile sınırlı
+            n = top_notch(sen["ae"], contours_of, runs_at_x)
+            if n:
+                ci, k, depth = n
+                if depth > AE_NOTCH_MAX:
+                    raise_notch(sen["ae"], ci, k, depth - AE_NOTCH_MAX)
+                log[m]["ae_notch"] = [round(depth), round(top_notch(sen["ae"], contours_of, runs_at_x)[2])]
             log[m]["ordfeminine"] = build_ordfeminine(sen, cuts, term_rel, m)
             # a/e'nin boşluk ve kerning referansı: Sen'in eski a/e'si, ama yeni I/ı ile
             orig = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
             build_straight(orig, variant)
             build_cedilla(orig, variant)
             build_j(orig, variant)
+            build_lira(orig, variant)
             build_marks(orig)
             log[m]["straight_kerning"] = remap_straight_kerning(sen)
             remap_straight_kerning(orig)
@@ -694,6 +856,8 @@ def harmonize(variant):
                               ROOT / "upstream/inter")
             )
             _clear_profile_cache()
+        if variant == "uyarlanmis":
+            log[m]["cv08"] = add_serif_i(sen, ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo"))
         sen.info.familyName = f"Sen Deneme {variant.capitalize()}"
     return fonts, log
 
@@ -741,11 +905,14 @@ def apply_terminals(g, master, cuts, term_rel, scale=1.0):
     xs = [p.x for c in g.contours for p in c.points if p.type]
     mid = (max(ys) + min(ys)) / 2
     x0, w = min(xs), max(xs) - min(xs)
-    for k, (ci, i) in enumerate(find_terminals(g)):
+    seen = {}
+    for ci, i in find_terminals(g):
         kind = "top" if g.contours[ci].points[i].y > mid else "bottom"
         if kind not in CUT_TERMINALS:
             continue
-        key = (g.name, k)
+        # anahtar türe göre sıra: açılara bağlı olarak bir masterda fazladan bulunan uç kaydırmasın
+        seen[kind] = seen.get(kind, -1) + 1
+        key = (g.name, kind, seen[kind])
         x_outer = _outer_tip_x(g, ci, i)
         if master == "Regular":
             x_trim, cut = make_vertical(copy.deepcopy(g), ci, i, TERMINAL_K_REGULAR * cuts[kind] * scale)
@@ -899,6 +1066,8 @@ if __name__ == "__main__":
             ref = [ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo") for m in MASTERS]
             log["condense"] = condense(fonts["Regular"], fonts["ExtraBold"], CONDENSE, ref)
             log["tracking"] = {m: track(fonts[m], TRACKING[m]) for m in MASTERS}
+            log["collision_guard"] = {
+                m: collision_guard(fonts[m], r, log["condense"][m]["scale_x"]) for m, r in zip(MASTERS, ref)}
         out = ROOT / "variants" / variant
         if out.exists():
             shutil.rmtree(out)
