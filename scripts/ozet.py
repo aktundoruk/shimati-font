@@ -23,7 +23,7 @@ PARA_1 = (
     "altına taşmadan Türkçeyi rahatça taşıyabilmeli."
 )
 PARA_2 = (
-    "Pijamalı hasta yağız şoföre çabucak güvendi. Öğleden sonra İstanbul’da ılık bir rüzgâr esiyordu; "
+    "Pijamalı hasta yağız şoföre çabucak güvendi. Jale, Japonya’dan dönerken jöle ve reçel almıştı. Öğleden sonra İstanbul’da ılık bir rüzgâr esiyordu; "
     "Çağla ile Işıl, Üsküdar iskelesinde çaylarını içip şehrin ışıklarını izlediler. Saat 18.45’te "
     "vapur kalktığında, 2.350 ₺’lik hesabın 1.175 ₺’sini ödemişlerdi bile."
 )
@@ -31,6 +31,7 @@ CHANGES = [
     ("a, e, æ, ª", "Inter’den; Sen’in genişlik, kalınlık ve boşluk sistemine uyarlandı. a’nın ucu Sen gibi dik kesik, e’ninki Inter’in açılı ucu."),
     ("I, ı, i", "Inter gibi düz çubuk: I’nın serifleri ve ı/i’nin bayrağı kalktı. ı’nın sağ boşluğu n’ninkine eşitlendi."),
     ("Ç ç Ş ş", "Sen’in C S c s’si korundu; çengel Inter’den, daha kısa (240 → 187 birim)."),
+    ("J, j", "Inter’den: J taban çizgisine oturan çanaklı biçim, j bayraksız ve kuyruğu Sen’in alt uzantısına iniyor. Kerning Inter’in kendi J/j çiftlerinden."),
     ("i j İ noktası", "Inter’in oranında, daha küçük; Sen’deki iki farklı nokta tek noktaya indi."),
     ("Ğ ğ", "Kısa şapka Inter’den: daha ince ve narin."),
     ("Genişlik", "Tüm harfler gövde kalınlığı korunarak %8 daraltıldı; Regular’da aralık her yandan 8 birim sıkıştırıldı."),

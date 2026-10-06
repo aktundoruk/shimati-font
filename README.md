@@ -58,9 +58,18 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
   eski çapanın üstüne ortalanır, `i`'nin noktası gövdenin ortasına. Sen'de `i`'nin noktası (136 / 215) ile
   nokta aksanı (126 / 152; Türkçe `i` ve `İ` bunu kullanıyor) farklıydı, artık tek nokta (112 / 174).
   ExtraBold'da `İ` noktası bu yüzden biraz büyüdü (152 → 174), `i`'ninki küçüldü (215 → 174).
+- `J` ve `j` (`build_j`): `J` Inter'in taban çizgisine oturan çanaklı biçimi; gövde ve alt kalınlık Sen `U`'suna,
+  genişlik Sen `U` × (Inter `J`/`U`), boşluklar Inter'deki `J`/`U` oranıyla. `ȷ` gövde ve boşlukta Sen `n`'sine
+  (`ı` gibi bayraksız), kuyruk kalınlığı `a` ile aynı kuralla; taban altı noktalar topluca Sen `p`'nin alt ucuna
+  (−240) kaydırılır, aradaki düz gövde uzar. `Ŋ` eski `J`'yi kanca olarak kullandığı için önce konturlara
+  çevrilir (Sen'in kancası kalır). `j`'nin noktası gövdenin ortasına alınır.
+- `J`/`j` kerning'i: Sen'in eski `J`'si bambaşka bir şekil olduğu için referans olamaz; Inter'in kendi çiftleri
+  HarfBuzz ile ölçülüp `J`'nin x ağırlığına interpole edilir ve ölçeklenir (`kerning.inter_pairs`). Sen'in
+  harflerine karşı çarpışma kontrolü `U` / `ı` çiftlerine göre (ör. ExtraBold `P J` −95 → −35).
 - Daraltma (`scripts/condense.py`, en sonda): her masterın x koordinatları Regular–ExtraBold arasında
   biraz daha kalın bir ağırlıktan alınıp ölçeklenir, y'ler aynı kalır. Ağırlık ve ölçek, `n` gövdesi aynı
-  kalacak ve küçük harflerin ortalama genişliği `CONDENSE` (0.92) oranına inecek şekilde çözülür
+  kalacak ve küçük harflerin ortalama genişliği Sen'in orijinaline göre `CONDENSE` (0.92) oranına inecek
+  şekilde çözülür (referans sabit, tek bir harf değişince oran kaymaz)
   (Regular: x ağırlığı ≈ 443, ölçek 0.915; ExtraBold: ≈ 996 yani ExtraBold'un %19 ötesi, ölçek 0.908).
   Bileşen ofsetleri, çapalar ve kerning de aynı dönüşümle; bağımsız noktalar (i, j, ., ¨, ˙, ÷) yuvarlak
   kalsın diye yalnızca taşınır.
@@ -75,8 +84,7 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 
 - **`I` / `l` / `1` ayrımı**: `I` ve `l` artık ikisi de düz çubuk, yalnızca boyları farklı (670 / 720).
   Arayüzde (kodlar, şifreler, "Il") karışabilir. Inter bu yüzden serifli `I` seçeneği sunuyor (cv08).
-- **`j` hâlâ bayraklı**: Sen'in `j`'si (ve `ij`'deki `j`) sol üst bayrağını koruyor; bayraksız `i` ile tutarlı
-  olması için `j` de Inter'den alınabilir.
+- **`Ŋ`**: Sen'in eski `J` kancasını koruyor; yeni `J`/`j` ile uyumu gözden geçirilmeli.
 
 - **`e`'nin ağzı**: Sen'inkinden ~%25 kapalı (Regular 80 / 108, ExtraBold 47 / 66 birim). ExtraBold'da açılı
   kesik orta çizgiye paralel uzandığı için büyük boyutta yarık gibi görünüyor.

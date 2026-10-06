@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="IJ" format="2">
-  <advance width="672"/>
+  <advance width="881"/>
   <unicode hex="0132"/>
   <anchor x="241" y="10" name="ogonek"/>
   <anchor x="161" y="670" name="top"/>

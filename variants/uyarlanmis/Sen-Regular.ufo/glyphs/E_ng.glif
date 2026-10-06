@@ -14,7 +14,18 @@
       <point x="126" y="670" type="line"/>
       <point x="90" y="670" type="line"/>
     </contour>
-    <component base="J" xOffset="403"/>
+    <contour>
+      <point x="389" y="-255" type="line"/>
+      <point x="506" y="-210"/>
+      <point x="591" y="-136"/>
+      <point x="591" y="34" type="curve" smooth="yes"/>
+      <point x="591" y="672" type="line"/>
+      <point x="501" y="672" type="line"/>
+      <point x="501" y="16" type="line" smooth="yes"/>
+      <point x="501" y="-65"/>
+      <point x="450" y="-127"/>
+      <point x="347" y="-168" type="curve"/>
+    </contour>
   </outline>
   <lib>
     <dict>

@@ -23,7 +23,7 @@ from fontTools.ttLib import TTFont
 sys.path.insert(0, str(Path(__file__).parent))
 from geom import bounds, contours_of, runs_at_x, runs_at_y  # noqa: E402
 from condense import condense, track  # noqa: E402
-from kerning import adjust as adjust_kerning, optical_gap  # noqa: E402
+from kerning import adjust as adjust_kerning, inter_pairs, optical_gap  # noqa: E402
 from terminals import (  # noqa: E402
     _outer_is_in, find_terminals, make_vertical, make_vertical_at, sen_cut_lengths, terminal_rel_x,
 )
@@ -313,6 +313,126 @@ def inter_mark(sen, char, t, cx):
     return transform(g, 1, 1, lambda y: y, cx - (x0 + x1) / 2)
 
 
+def bottom_run(g):
+    """En alçak noktanın x'indeki alt çizgi (alttan ilk mürekkep aralığı)."""
+    P = contours_of(g)
+    ymin = min(p[1] for poly in P for p in poly)
+    xs = [p[0] for poly in P for p in poly if p[1] <= ymin + 1]
+    return runs_at_x(P, sum(xs) / len(xs))[0]
+
+
+def decompose_component(font, name, base):
+    """`name` içindeki `base` bileşenini konturlara çevirir (base değişeceği için)."""
+    g = font[name]
+    for c in list(g.components):
+        if c.baseGlyph != base:
+            continue
+        rec = DecomposingRecordingPen(font)
+        font[base].draw(rec)
+        from fontTools.pens.transformPen import TransformPen
+        rec.replay(TransformPen(SegmentToPointPen(g.getPointPen()), c.transformation))
+        g.components.remove(c)
+
+
+def build_j(sen, variant):
+    """J ve ȷ (j'nin gövdesi) Inter'den.
+
+    J: Inter'in taban çizgisine oturan, çanaklı J'si. Gövde ve alt kalınlık Sen U'suna, genişlik
+    Sen U × (Inter J / U), boşluklar Inter'deki J/U oranıyla. Sen'in J'si alt uzantıya iniyordu;
+    Ŋ onu kanca olarak kullandığı için Ŋ'deki J önce konturlara çevrilir.
+    ȷ: gövde ve boşluk Sen n'sine (ı gibi), kuyruk kalınlığı a ile aynı kuralla (Inter o üst
+    kalınlığı = Sen o), kuyruk Sen'in alt uzantısına (p) kadar iner: taban altı noktalar topluca
+    kaydırılır, aradaki düz gövde uzar; kuyruğun kendi şekli bozulmaz.
+    """
+    decompose_component(sen, "Eng", "J")
+    log = {}
+    cap, xh = sen.info.capHeight, sen.info.xHeight
+    old_j = {a.name: (a.x, a.y) for a in sen["jdotless"].anchors}
+    old_stem = runs_at_y(contours_of(SenGlyph(sen, "jdotless")), xh * 0.5)[-1]
+
+    # --- J
+    iJ, iU = InterGlyph("J"), InterGlyph("U")
+    sU = SenGlyph(sen, "U")
+    s = cap / INTER_CAP
+    if variant == "dogrudan":
+        t = mark_weight(sen)
+        tx = ty = t
+        sx = s
+        ymap = lambda y: y  # noqa: E731
+        src = iJ.at(t, t)
+        lsb, rsb = ink(src)[0] * s, (iJ.advance(t) - ink(src)[2]) * s
+    else:
+        u_ink = ink(sU)
+        u_stem = _w(runs_at_y(contours_of(sU), cap * 0.6)[-1])
+        u_bot = _w(bottom_run(sU))
+        ty = solve(lambda t: _w(bottom_run(iJ.at(0, t))) * s, u_bot)
+        tx, sx = 0.0, s
+        for _ in range(6):
+            j_ink, i_u = ink(iJ.at(tx, ty)), ink(iU.at(tx, ty))
+            sx = (u_ink[2] - u_ink[0]) * (j_ink[2] - j_ink[0]) / (i_u[2] - i_u[0]) / (j_ink[2] - j_ink[0])
+            tx = solve(lambda t: _w(runs_at_y(contours_of(iJ.at(t, ty)), INTER_CAP * 0.6)[-1]) * sx, u_stem)
+        iu_bot = ink(iU.at(tx, ty))[1] * s
+
+        def ymap(y, k=u_ink[1] / iu_bot):
+            return y * k if y < 0 else y
+
+        src = iJ.at(tx, ty)
+        j_ink, i_u = ink(src), ink(iU.at(tx, ty))
+        lsb = u_ink[0] * j_ink[0] / i_u[0]
+        rsb = (sen["U"].width - u_ink[2]) * (iJ.advance(tx) - j_ink[2]) / (iU.advance(tx) - i_u[2])
+    lsb, rsb = round(lsb), round(rsb)
+    shaped = transform(src, sx, s, ymap, 0)
+    final = transform(shaped, 1, 1, lambda y: y, lsb - ink(shaped)[0])
+    g = sen["J"]
+    write_outline(g, final)
+    g.width = round(ink(final)[2] + rsb)
+    log["J"] = {"inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
+                "scale_x": round(sx, 4), "lsb": lsb, "rsb": rsb, "width": g.width}
+
+    # --- ȷ
+    ij, i_n = InterGlyph("ȷ"), InterGlyph("n")
+    s = xh / INTER_XH
+    sn = SenGlyph(sen, "n")
+    n_ink = ink(sn)
+    if variant == "dogrudan":
+        t = mark_weight(sen)
+        tx = ty = t
+        src = ij.at(t, t)
+        stem = runs_at_y(contours_of(src), INTER_XH * 0.5)[-1]
+        stem_x0 = stem[0] * s
+        rsb = (ij.advance(t) - stem[1]) * s
+        drop = 0
+    else:
+        ty = solve(lambda t: o_top(InterGlyph("o").at(0, t)) * s, o_top(SenGlyph(sen, "o")))
+        tx = solve(lambda t: _w(runs_at_y(contours_of(ij.at(t, ty)), INTER_XH * 0.5)[-1]) * s,
+                   stem_n(sn, xh))
+        src = ij.at(tx, ty)
+        stem = runs_at_y(contours_of(src), INTER_XH * 0.5)[-1]
+        in_ink = ink(i_n.at(tx, ty))
+        stem_x0 = n_ink[0] * stem[0] / in_ink[0]
+        rsb = (sen["n"].width - n_ink[2]) * (ij.advance(tx) - stem[1]) / (i_n.advance(tx) - in_ink[2])
+        # kuyruk Sen'in alt uzantısına: p'nin alt ucu
+        drop = ink(SenGlyph(sen, "p"))[1] - ink(src)[1] * s
+    shaped = transform(src, s, 1, lambda y: y * s if y >= 0 else y * s + drop, 0)
+    stem_new = runs_at_y(contours_of(shaped), xh * 0.5)[-1]
+    final = transform(shaped, 1, 1, lambda y: y, round(stem_x0) - stem_new[0])
+    g = sen["jdotless"]
+    write_outline(g, final)
+    stem_new = runs_at_y(contours_of(final), xh * 0.5)[-1]
+    g.width = round(stem_new[1] + rsb)
+    g.clearAnchors()
+    for an, (ax, ay) in old_j.items():
+        nx = (stem_new[0] + stem_new[1]) / 2 if an == "top" else \
+            stem_new[0] + (ax - old_stem[0]) / _w(old_stem) * _w(stem_new)
+        g.appendAnchor({"name": an, "x": round(nx), "y": ay})
+    log["jdotless"] = {"inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
+                       "scale": round(s, 4),
+                       "stem": round(_w(stem_new)), "stem_lsb": round(stem_new[0]), "rsb": round(rsb),
+                       "width": g.width, "bottom": round(ink(final)[1])}
+    fix_composites(sen, None, bases=("jdotless",))
+    return log
+
+
 def build_marks(sen):
     """i/j noktası, nokta aksanı (İ ċ ė ġ ż, Türkçe i) ve kısa şapka (Ğ ğ Ă ă Ŭ ŭ) Inter'den.
 
@@ -337,7 +457,8 @@ def build_marks(sen):
         respace_spacing_mark(sen, name, spacing[name])
     # i ve j'nin kendi noktaları: i'de gövde ortasına, j'de eski noktanın yerine
     bx0, _, bx1, _ = ink(SenGlyph(sen, "idotless"))
-    for name, cx in (("i", (bx0 + bx1) / 2), ("j", None)):
+    js = runs_at_y(contours_of(SenGlyph(sen, "jdotless")), sen.info.xHeight * 0.5)[-1]
+    for name, cx in (("i", (bx0 + bx1) / 2), ("j", (js[0] + js[1]) / 2)):
         g = sen[name]
         dot = g.contours[0]
         xs = [p.x for p in dot.points if p.type]
@@ -423,6 +544,7 @@ def harmonize(variant):
         fonts[m] = sen
         straight_log = build_straight(sen, variant)
         cedilla_log = build_cedilla(sen, variant)
+        j_log = build_j(sen, variant)
         marks_log = build_marks(sen)
         cuts = sen_cut_lengths(sen)
         params = {}
@@ -451,6 +573,7 @@ def harmonize(variant):
         log[m]["straight"] = straight_log
         log[m]["cedilla"] = cedilla_log
         log[m]["marks"] = marks_log
+        log[m]["j"] = j_log
 
         for name in "ae":
             ig = inter[name]
@@ -552,6 +675,7 @@ def harmonize(variant):
             orig = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
             build_straight(orig, variant)
             build_cedilla(orig, variant)
+            build_j(orig, variant)
             build_marks(orig)
             log[m]["straight_kerning"] = remap_straight_kerning(sen)
             remap_straight_kerning(orig)
@@ -559,6 +683,17 @@ def harmonize(variant):
         fix_composites(sen, old)
         if variant == "uyarlanmis":
             log[m]["kerning"] = adjust_kerning(orig, sen)
+            # J/j kerning'i: Sen'in eski J'si bambaşka bir şekil olduğundan referans olamaz;
+            # Inter'in kendi J/j çiftleri ölçeklenerek alınır (çarpışma kontrolü U / ı'ya göre)
+            _clear_profile_cache()
+            jl = j_log["J"], j_log["jdotless"]
+            log[m]["kerning_j"] = (
+                inter_pairs(sen, "J", "J", (jl[0]["inter_weight_x"] - 400) / 500, jl[0]["scale_x"], "U",
+                            ROOT / "upstream/inter")
+                + inter_pairs(sen, "j", "j", (jl[1]["inter_weight_x"] - 400) / 500, xh / INTER_XH, "idotless",
+                              ROOT / "upstream/inter")
+            )
+            _clear_profile_cache()
         sen.info.familyName = f"Sen Deneme {variant.capitalize()}"
     return fonts, log
 
@@ -680,7 +815,7 @@ def build_ordfeminine(sen, cuts, term_rel, master):
             "scale": [round(sx, 4), round(sy, 4)], "width": g.width, "points": [len(c) for c in g.contours]}
 
 
-def fix_composites(font, old, bases=("a", "e", "ae", "I", "idotless", "i")):
+def fix_composites(font, old, bases=("a", "e", "ae", "I", "idotless", "i", "jdotless")):
     """Değişen temel glifleri kullanan bileşikleri yeni çapalara ve genişliklere göre günceller."""
     # i önce: iogonek ve ij onun genişliğine bağlı
     order = sorted(font.keys(), key=lambda n: n != "i")
@@ -761,7 +896,8 @@ if __name__ == "__main__":
     for variant in ("dogrudan", "uyarlanmis"):
         fonts, log = harmonize(variant)
         if variant == "uyarlanmis":
-            log["condense"] = condense(fonts["Regular"], fonts["ExtraBold"], CONDENSE)
+            ref = [ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo") for m in MASTERS]
+            log["condense"] = condense(fonts["Regular"], fonts["ExtraBold"], CONDENSE, ref)
             log["tracking"] = {m: track(fonts[m], TRACKING[m]) for m in MASTERS}
         out = ROOT / "variants" / variant
         if out.exists():

@@ -76,10 +76,14 @@ def _solve_t(f, target, lo, hi):
     return (lo + hi) / 2
 
 
-def condense(R, B, factor):
-    """R ve B'yi (Regular, ExtraBold) yerinde daraltır; kullanılan t ve s değerlerini döndürür."""
+def condense(R, B, factor, ref=None):
+    """R ve B'yi (Regular, ExtraBold) yerinde daraltır; kullanılan t ve s değerlerini döndürür.
+
+    `ref` (Regular, ExtraBold): oranın hesaplandığı sabit referans (Sen'in orijinal masterları);
+    verilmezse R ve B kullanılır. Böylece tek bir harfin genişliği değişince oran kaymaz.
+    """
     sR, sB = _stem(R), _stem(B)
-    wR, wB = _avg_width(R), _avg_width(B)
+    wR, wB = (_avg_width(f) for f in (ref or (R, B)))
     src = {"Regular": copy.deepcopy(R), "ExtraBold": copy.deepcopy(B)}
     log = {}
     for name, font, t0 in (("Regular", R, 0.0), ("ExtraBold", B, 1.0)):
@@ -126,7 +130,7 @@ def condense(R, B, factor):
                 font.kerning[pair] = v
         log[name] = {"t": round(t, 3), "weight_x": round(400 + t * 500), "scale_x": round(s, 4),
                      "stem": [round(stem0), _stem(font)],
-                     "avg_width": [round(w0), round(_avg_width(font))]}
+                     "avg_width_ref": round(w0), "avg_width": round(_avg_width(font))}
     return log
 
 

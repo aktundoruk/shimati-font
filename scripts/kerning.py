@@ -51,12 +51,13 @@ def _profiles(font, name, step):
     return out
 
 
-def optical_gap(font, left, right, kern, cache, depth_ratio=0.15):
+def optical_gap(font, left, right, kern, cache, depth_ratio=0.15, zone=None):
     pl = cache.setdefault(left, profiles(font, left))
     pr = cache.setdefault(right, profiles(font, right))
     xh = font.info.xHeight
+    lo, hi = zone or (0, xh)
     adv = font[left].width + kern
-    gaps = [adv + pr[y][0] - pl[y][1] for y in pl.keys() & pr.keys() if 0 <= y <= xh]
+    gaps = [adv + pr[y][0] - pl[y][1] for y in pl.keys() & pr.keys() if lo <= y <= hi]
     if not gaps:
         return None
     floor = min(gaps)
@@ -106,4 +107,54 @@ def adjust(old_font, new_font, glyphs=("a", "e", "ae"), add_threshold=30, round_
                 continue
             new_font.kerning[(left, right)] = k_new
             changes.append({"pair": f"{left} {right}", "old": k_old, "new": k_new, "existed": exists})
+    return changes
+
+
+
+def inter_pairs(font, glyph, char, tx, sx, analog, inter_dir, round_to=5):
+    """Inter'den alınan bir glifin kerning'i: Inter'in kendi çiftleri (HarfBuzz ile ölçülür),
+    Regular–Black arasında glifin x ağırlığına (tx) interpole edilip yatay ölçekle (sx) küçültülür.
+
+    Sen'in şekillerine karşı çarpışma kontrolü: en dar boşluk, `analog` harfle kurulan çiftin en dar
+    boşluğunun %60'ından aza inerse gevşetilir.
+    """
+    import uharfbuzz as hb
+
+    def table(weight):
+        data = (inter_dir / f"Inter-{weight}.otf").read_bytes()
+        hfont = hb.Font(hb.Face(data))
+
+        def adv(text, kern):
+            buf = hb.Buffer()
+            buf.add_str(text)
+            buf.guess_segment_properties()
+            hb.shape(hfont, buf, {"kern": kern, "calt": False, "liga": False})
+            return buf.glyph_positions[0].x_advance
+
+        out = {}
+        for name in font.keys():
+            g = font[name]
+            if not g.unicodes or len(name) > 2 or not name.isalpha() or name == glyph:
+                continue
+            p = chr(g.unicodes[0])
+            for a, b, key in ((p, char, (name, glyph)), (char, p, (glyph, name))):
+                k = adv(a + b, True) - adv(a + b, False)
+                if k:
+                    out[key] = k
+        return out
+
+    reg, black = table("Regular"), table("Black")
+    changes = []
+    for pair in sorted(set(reg) | set(black)):
+        v = reg.get(pair, 0) + tx * (black.get(pair, 0) - reg.get(pair, 0))
+        k = round(v * sx / round_to) * round_to
+        left, right = pair
+        aleft, aright = (analog if left == glyph else left), (analog if right == glyph else right)
+        limit = 0.6 * raw_min_gap(font, aleft, aright, font.kerning.get((aleft, aright), 0))
+        while raw_min_gap(font, left, right, k) < limit:
+            k += round_to
+        if not k:
+            continue
+        font.kerning[pair] = k
+        changes.append({"pair": f"{left} {right}", "inter": round(v), "new": k})
     return changes
