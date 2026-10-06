@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="AE" format="2">
+  <advance width="1072"/>
+  <unicode hex="00C6"/>
+  <anchor x="752" y="0" name="bottom"/>
+  <anchor x="359" y="10" name="ogonek"/>
+  <anchor x="88" y="670" name="top"/>
+  <outline>
+    <contour>
+      <point x="15" y="0" type="line"/>
+      <point x="203" y="0" type="line"/>
+      <point x="557" y="508" type="line"/>
+      <point x="579" y="670" type="line"/>
+      <point x="488" y="670" type="line"/>
+    </contour>
+    <contour>
+      <point x="272" y="133" type="line"/>
+      <point x="593" y="133" type="line"/>
+      <point x="593" y="270" type="line"/>
+      <point x="272" y="270" type="line"/>
+    </contour>
+    <component base="E" xOffset="428"/>
+  </outline>
+  <lib>
+    <dict>
+      <key>com.schriftgestaltung.Glyphs.glyph.leftMetricsKey</key>
+      <string>=V</string>
+      <key>com.schriftgestaltung.Glyphs.glyph.rightMetricsKey</key>
+      <string>=E</string>
+      <key>com.schriftgestaltung.Glyphs.layer.leftMetricsKey</key>
+      <string>=V</string>
+      <key>com.schriftgestaltung.Glyphs.shapeOrder</key>
+      <string>PPC</string>
+      <key>public.markColor</key>
+      <string>0.67,0.95,0.38,1</string>
+    </dict>
+  </lib>
+</glyph>

@@ -1,0 +1,316 @@
+"""Inter'in a ve e gliflerini Sen'in iki masterına (Regular, ExtraBold) uyarlar.
+
+İki varyant üretir:
+  dogrudan   - yalnızca x-height'e göre eşit ölçek + dikey gövdeye göre tek ağırlık seçimi
+  uyarlanmis - Sen'in genişlik ritmine göre yatay ölçek, dikey ve yatay kalınlığın ayrı ayrı
+               eşlenmesi (anizotropik interpolasyon), overshoot eşleme, Sen'e göre boşluk
+
+Inter'in Regular→Black aralığı nokta nokta doğrusal olduğu için (ölçüldü, sapma < 2/2048)
+x ve y koordinatları Regular ve Black arasında birbirinden bağımsız interpole edilebiliyor.
+"""
+
+import json
+import shutil
+import sys
+from pathlib import Path
+
+import ufoLib2
+from fontTools.pens.recordingPen import DecomposingRecordingPen, RecordingPen
+from fontTools.pens.pointPen import SegmentToPointPen
+from fontTools.ttLib import TTFont
+
+sys.path.insert(0, str(Path(__file__).parent))
+from geom import bounds, contours_of, runs_at_x, runs_at_y  # noqa: E402
+
+ROOT = Path(__file__).resolve().parent.parent
+MASTERS = ["Regular", "ExtraBold"]
+INTER_XH = 1118
+
+
+class OpsGlyph:
+    def __init__(self, ops):
+        self.ops = ops
+
+    def draw(self, pen):
+        for op, args in self.ops:
+            getattr(pen, op)(*args)
+
+
+class SenGlyph:
+    def __init__(self, font, name):
+        self.font, self.name = font, name
+
+    def draw(self, pen):
+        rec = DecomposingRecordingPen(self.font)
+        self.font[self.name].draw(rec)
+        rec.replay(pen)
+
+
+class InterGlyph:
+    """Inter Regular ve Black arasında x ve y için ayrı ağırlıkla interpole edilen glif."""
+
+    def __init__(self, name):
+        self.name = name
+        self.ops = {}
+        self.adv = {}
+        for w in ("Regular", "Black"):
+            font = TTFont(ROOT / f"upstream/inter/Inter-{w}.otf")
+            gname = font.getBestCmap()[ord(name)]
+            pen = RecordingPen()
+            font.getGlyphSet()[gname].draw(pen)
+            self.ops[w] = pen.value
+            self.adv[w] = font["hmtx"][gname][0]
+        assert [o for o, _ in self.ops["Regular"]] == [o for o, _ in self.ops["Black"]]
+
+    def at(self, tx, ty):
+        out = []
+        for (op, ra), (_, ba) in zip(self.ops["Regular"], self.ops["Black"]):
+            out.append((op, tuple(
+                (r[0] + tx * (b[0] - r[0]), r[1] + ty * (b[1] - r[1])) for r, b in zip(ra, ba)
+            )))
+        return OpsGlyph(out)
+
+    def advance(self, tx):
+        return self.adv["Regular"] + tx * (self.adv["Black"] - self.adv["Regular"])
+
+
+# --- ölçümler -------------------------------------------------------------
+
+def stem_n(g, xh):
+    return _w(runs_at_y(contours_of(g), xh * 0.4)[0])
+
+
+def o_side(g):
+    P = contours_of(g)
+    x0, y0, x1, y1 = bounds(P)
+    return _w(runs_at_y(P, (y0 + y1) / 2)[0])
+
+
+def o_top(g):
+    P = contours_of(g)
+    x0, y0, x1, y1 = bounds(P)
+    return _w(runs_at_x(P, (x0 + x1) / 2)[-1])
+
+
+def ink(g):
+    return bounds(contours_of(g))
+
+
+def _w(run):
+    return run[1] - run[0]
+
+
+def solve(f, target, lo=0.0, hi=1.0):
+    """f(t) yaklaşık doğrusal; secant ile f(t) = target çöz (ekstrapolasyona izin verir)."""
+    a, b = lo, hi
+    fa, fb = f(a) - target, f(b) - target
+    for _ in range(8):
+        if abs(fb - fa) < 1e-9:
+            break
+        c = b - fb * (b - a) / (fb - fa)
+        a, fa, b, fb = b, fb, c, f(c) - target
+    return b
+
+
+# --- dönüşüm --------------------------------------------------------------
+
+def transform(glyph, sx, sy, ymap, dx):
+    out = []
+    for op, args in glyph.ops:
+        out.append((op, tuple((round(x * sx + dx), round(ymap(y * sy))) for x, y in args)))
+    return OpsGlyph(out)
+
+
+def write_outline(ufo_glyph, ops_glyph):
+    ufo_glyph.clearContours()
+    ops_glyph.draw(SegmentToPointPen(ufo_glyph.getPointPen()))
+
+
+def top_extreme_x(ops_glyph):
+    pts = [p for op, args in ops_glyph.ops if op in ("moveTo", "lineTo", "curveTo") for p in args[-1:]]
+    ymax = max(p[1] for p in pts)
+    xs = [p[0] for p in pts if p[1] >= ymax - 1]
+    return sum(xs) / len(xs)
+
+
+def harmonize(variant):
+    inter = {n: InterGlyph(n) for n in "aeno"}
+    log = {}
+    fonts = {}
+    for m in MASTERS:
+        sen = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
+        fonts[m] = sen
+        xh = sen.info.xHeight
+        sy = xh / INTER_XH
+        s_n, s_o, s_a, s_e = (SenGlyph(sen, n) for n in "noae")
+        tgt = {
+            "stem": stem_n(s_n, xh),
+            "oside": o_side(s_o),
+            "otop": o_top(s_o),
+            "n_ink": ink(s_n),
+            "o_ink": ink(s_o),
+            "e_ink": ink(s_e),
+            "o_lsb": ink(s_o)[0],
+            "o_rsb": sen["o"].width - ink(s_o)[2],
+            "n_lsb": ink(s_n)[0],
+        }
+        o_bounds = ink(s_o)
+        os_top, os_bot = o_bounds[3] - xh, o_bounds[1]
+        old = {n: (ink(SenGlyph(sen, n)), sen[n].width, {a.name: (a.x, a.y) for a in sen[n].anchors}) for n in "ae"}
+        log[m] = {"xHeight": xh, "targets": {k: round(v, 1) if isinstance(v, float) else v for k, v in tgt.items() if k in ("stem", "oside", "otop")}}
+
+        for name in "ae":
+            ig = inter[name]
+            if variant == "dogrudan":
+                sx = sy
+                t = solve(lambda t: stem_n(inter["n"].at(t, t), INTER_XH) * sy, tgt["stem"])
+                tx = ty = t
+                ymap = lambda y: y  # noqa: E731
+            else:
+                # y: Inter o'sunun üst kalınlığı Sen o'sununkine eşit olsun
+                ty = solve(lambda t: o_top(inter["o"].at(0, t)) * sy, tgt["otop"])
+                # x: genişlik ve dikey kalınlık birlikte çözülür
+                tx = 0.0
+                for _ in range(6):
+                    w_inter = ink(ig.at(tx, ty))
+                    w_inter = w_inter[2] - w_inter[0]
+                    if name == "a":
+                        n_i = ink(inter["n"].at(tx, ty))
+                        target_w = (tgt["n_ink"][2] - tgt["n_ink"][0]) * w_inter / (n_i[2] - n_i[0])
+                    else:
+                        target_w = tgt["e_ink"][2] - tgt["e_ink"][0]
+                    sx = target_w / w_inter
+                    if name == "a":
+                        tx = solve(lambda t: stem_n(inter["n"].at(t, ty), INTER_XH) * sx, tgt["stem"])
+                    else:
+                        tx = solve(lambda t: o_side(inter["o"].at(t, ty)) * sx, tgt["oside"])
+                io = ink(inter["o"].at(tx, ty))
+                i_top, i_bot = io[3] * sy - xh, io[1] * sy
+
+                def ymap(y, i_top=i_top, i_bot=i_bot):
+                    if y > xh:
+                        return xh + (y - xh) * os_top / i_top
+                    if y < 0:
+                        return y * os_bot / i_bot
+                    return y
+
+            src = ig.at(tx, ty)
+            shaped = transform(src, sx, sy, ymap, 0)
+            x0, _, x1, _ = ink(shaped)
+
+            # boşluklar
+            i_ink = ink(src)
+            i_adv = ig.advance(tx)
+            if variant == "dogrudan":
+                lsb, rsb = i_ink[0] * sx, (i_adv - i_ink[2]) * sx
+            else:
+                io_ink = ink(inter["o"].at(tx, ty))
+                io_lsb, io_rsb = io_ink[0], inter["o"].advance(tx) - io_ink[2]
+                in_lsb = ink(inter["n"].at(tx, ty))[0]
+                if name == "a":
+                    lsb = tgt["o_lsb"] * i_ink[0] / io_lsb
+                    rsb = tgt["n_lsb"] * (i_adv - i_ink[2]) / in_lsb
+                else:
+                    lsb = tgt["o_lsb"] * i_ink[0] / io_lsb
+                    rsb = tgt["o_rsb"] * (i_adv - i_ink[2]) / io_rsb
+            lsb, rsb = round(lsb), round(rsb)
+            final = transform(shaped, 1, 1, lambda y: y, lsb - x0)
+            nx0, ny0, nx1, ny1 = ink(final)
+            width = round(nx1 + rsb)
+
+            g = sen[name]
+            write_outline(g, final)
+            g.width = width
+            (ox0, oy0, ox1, oy1), _, oanch = old[name]
+            g.clearAnchors()
+            for aname, (ax, ay) in oanch.items():
+                if aname == "top":
+                    nx, ny = round(top_extreme_x(final)), ay
+                elif name == "a" and aname == "ogonek":
+                    nx, ny = round(nx1 + (ax - ox1)), ay
+                else:
+                    nx, ny = round(nx0 + (ax - ox0) / (ox1 - ox0) * (nx1 - nx0)), ay
+                g.appendAnchor({"name": aname, "x": nx, "y": ny})
+
+            P = contours_of(SenGlyph(sen, name))
+            log[m][name] = {
+                "inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
+                "scale_x": round(sx, 4), "scale_y": round(sy, 4),
+                "width": width, "lsb": lsb, "rsb": rsb,
+                "bbox": [round(v) for v in ink(final)],
+                "points": [len(c) for c in g.contours],
+                "measured": {
+                    "stem@0.4xh": [round(_w(r)) for r in runs_at_y(P, xh * 0.4)],
+                    "vruns@center": [round(_w(r)) for r in runs_at_x(P, (nx0 + nx1) / 2)],
+                },
+            }
+
+        fix_composites(sen, old)
+        sen.info.familyName = f"Sen Deneme {variant.capitalize()}"
+    return fonts, log
+
+
+def fix_composites(font, old):
+    """a/e kullanan bileşik glifleri yeni çapalara ve genişliklere göre günceller."""
+    new_a_ink, new_e_ink = ink(SenGlyph(font, "a")), ink(SenGlyph(font, "e"))
+    for g in font:
+        bases = [c.baseGlyph for c in g.components]
+        if g.name in ("ae", "oe"):
+            continue
+        if not g.components or bases[0] not in ("a", "e"):
+            continue
+        base = font[bases[0]]
+        banch = {a.name: (a.x, a.y) for a in base.anchors}
+        g.width = base.width
+        for c in g.components[1:]:
+            manch = {a.name: (a.x, a.y) for a in font[c.baseGlyph].anchors}
+            for an, (mx, my) in manch.items():
+                if an.startswith("_") and an[1:] in banch:
+                    bx, by = banch[an[1:]]
+                    c.transformation = (1, 0, 0, 1, bx - mx, by - my)
+                    break
+        new_anchors = dict(banch)
+        for c in g.components[1:]:
+            dx, dy = c.transformation[4], c.transformation[5]
+            for a in font[c.baseGlyph].anchors:
+                if not a.name.startswith("_"):
+                    new_anchors[a.name] = (a.x + dx, a.y + dy)
+        g.clearAnchors()
+        for an, (x, y) in new_anchors.items():
+            g.appendAnchor({"name": an, "x": round(x), "y": round(y)})
+
+    (oa_ink, oa_w, _), (oe_ink, oe_w, _) = old["a"], old["e"]
+    # æ: e'nin a'nın sağ gövdesine binme miktarını koru
+    ae = font["ae"]
+    ce = next(c for c in ae.components if c.baseGlyph == "e")
+    off_old = ce.transformation[4]
+    overlap = oa_ink[2] - (off_old + oe_ink[0])
+    tail = ae.width - (off_old + oe_w)
+    off_new = round(new_a_ink[2] - overlap - new_e_ink[0])
+    ce.transformation = (1, 0, 0, 1, off_new, 0)
+    ae.width = off_new + font["e"].width + tail
+    # œ: e'nin mürekkep sol kenarını aynı yerde tut
+    oe = font["oe"]
+    ce = next(c for c in oe.components if c.baseGlyph == "e")
+    off_old = ce.transformation[4]
+    tail = oe.width - (off_old + oe_w)
+    off_new = round(off_old + oe_ink[0] - new_e_ink[0])
+    ce.transformation = (1, 0, 0, 1, off_new, 0)
+    oe.width = off_new + font["e"].width + tail
+
+
+if __name__ == "__main__":
+    all_logs = {}
+    for variant in ("dogrudan", "uyarlanmis"):
+        fonts, log = harmonize(variant)
+        out = ROOT / "variants" / variant
+        if out.exists():
+            shutil.rmtree(out)
+        out.mkdir(parents=True)
+        for m, f in fonts.items():
+            f.save(out / f"Sen-{m}.ufo")
+        shutil.copy(ROOT / "sources/Sen.designspace", out / "Sen.designspace")
+        all_logs[variant] = log
+    (ROOT / "build").mkdir(exist_ok=True)
+    (ROOT / "build/olcumler.json").write_text(json.dumps(all_logs, indent=1, ensure_ascii=False))
+    print(json.dumps(all_logs, indent=1, ensure_ascii=False))

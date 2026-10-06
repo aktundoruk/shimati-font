@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="Edieresis" format="2">
+  <anchor x="324" y="0" name="bottom"/>
+  <anchor x="575" y="10" name="ogonek"/>
+  <anchor x="324" y="670" name="top"/>
+  <outline>
+    <contour>
+      <point x="574" y="670" type="line"/>
+      <point x="80" y="670" type="line"/>
+      <point x="80" y="0" type="line"/>
+      <point x="574" y="0" type="line"/>
+      <point x="574" y="160" type="line"/>
+      <point x="267" y="160" type="line"/>
+      <point x="267" y="515" type="line"/>
+      <point x="574" y="515" type="line"/>
+    </contour>
+    <contour>
+      <point x="540" y="414" type="line"/>
+      <point x="185" y="414" type="line"/>
+      <point x="185" y="264" type="line"/>
+      <point x="540" y="264" type="line"/>
+    </contour>
+    <contour>
+      <point x="429" y="885" type="curve" smooth="yes"/>
+      <point x="387" y="885"/>
+      <point x="353" y="851"/>
+      <point x="353" y="809" type="curve" smooth="yes"/>
+      <point x="353" y="768"/>
+      <point x="387" y="733"/>
+      <point x="429" y="733" type="curve"/>
+      <point x="470" y="733"/>
+      <point x="505" y="768"/>
+      <point x="505" y="809" type="curve" smooth="yes"/>
+      <point x="505" y="851"/>
+      <point x="470" y="885"/>
+    </contour>
+    <contour>
+      <point x="219" y="885" type="curve" smooth="yes"/>
+      <point x="177" y="885"/>
+      <point x="143" y="851"/>
+      <point x="143" y="809" type="curve" smooth="yes"/>
+      <point x="143" y="768"/>
+      <point x="177" y="733"/>
+      <point x="219" y="733" type="curve"/>
+      <point x="260" y="733"/>
+      <point x="295" y="768"/>
+      <point x="295" y="809" type="curve" smooth="yes"/>
+      <point x="295" y="851"/>
+      <point x="260" y="885"/>
+    </contour>
+  </outline>
+</glyph>

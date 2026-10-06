@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="yen" format="2">
+  <advance width="741"/>
+  <unicode hex="00A5"/>
+  <anchor x="371" y="670" name="top"/>
+  <outline>
+    <contour>
+      <point x="141" y="231" type="line"/>
+      <point x="591" y="231" type="line"/>
+      <point x="591" y="321" type="line"/>
+      <point x="141" y="321" type="line"/>
+    </contour>
+    <contour>
+      <point x="141" y="106" type="line"/>
+      <point x="591" y="106" type="line"/>
+      <point x="591" y="196" type="line"/>
+      <point x="141" y="196" type="line"/>
+    </contour>
+    <component base="Y"/>
+  </outline>
+  <lib>
+    <dict>
+      <key>com.schriftgestaltung.Glyphs.glyph.leftMetricsKey</key>
+      <string>+Y</string>
+      <key>com.schriftgestaltung.Glyphs.glyph.rightMetricsKey</key>
+      <string>=Y</string>
+      <key>com.schriftgestaltung.Glyphs.layer.leftMetricsKey</key>
+      <string>=Y</string>
+      <key>com.schriftgestaltung.Glyphs.shapeOrder</key>
+      <string>PPC</string>
+      <key>public.markColor</key>
+      <string>0.67,0.95,0.38,1</string>
+    </dict>
+  </lib>
+</glyph>

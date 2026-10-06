@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="i" format="2">
+  <advance width="308"/>
+  <unicode hex="0069"/>
+  <anchor x="218" y="0" name="ogonek"/>
+  <anchor x="175" y="500" name="top"/>
+  <outline>
+    <contour>
+      <point x="165" y="604" type="curve" smooth="yes"/>
+      <point x="203" y="604"/>
+      <point x="233" y="637"/>
+      <point x="233" y="672" type="curve" smooth="yes"/>
+      <point x="233" y="708"/>
+      <point x="203" y="740"/>
+      <point x="165" y="740" type="curve" smooth="yes"/>
+      <point x="126" y="740"/>
+      <point x="97" y="708"/>
+      <point x="97" y="672" type="curve" smooth="yes"/>
+      <point x="97" y="637"/>
+      <point x="126" y="604"/>
+    </contour>
+    <component base="idotless"/>
+  </outline>
+  <lib>
+    <dict>
+      <key>com.schriftgestaltung.Glyphs.glyph.leftMetricsKey</key>
+      <string>=n-20</string>
+      <key>com.schriftgestaltung.Glyphs.glyph.rightMetricsKey</key>
+      <string>=|n-20</string>
+      <key>com.schriftgestaltung.Glyphs.layer.leftMetricsKey</key>
+      <string>=n-30</string>
+      <key>com.schriftgestaltung.Glyphs.layer.rightMetricsKey</key>
+      <string>=|n-10</string>
+      <key>com.schriftgestaltung.Glyphs.shapeOrder</key>
+      <string>PC</string>
+      <key>public.markColor</key>
+      <string>0.67,0.95,0.38,1</string>
+    </dict>
+  </lib>
+</glyph>

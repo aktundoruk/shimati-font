@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="E" format="2">
+  <advance width="644"/>
+  <unicode hex="0045"/>
+  <anchor x="324" y="0" name="bottom"/>
+  <anchor x="575" y="10" name="ogonek"/>
+  <anchor x="324" y="670" name="top"/>
+  <outline>
+    <contour>
+      <point x="80" y="0" type="line"/>
+      <point x="574" y="0" type="line"/>
+      <point x="574" y="160" type="line"/>
+      <point x="267" y="160" type="line"/>
+      <point x="267" y="515" type="line"/>
+      <point x="574" y="515" type="line"/>
+      <point x="574" y="670" type="line"/>
+      <point x="80" y="670" type="line"/>
+    </contour>
+    <contour>
+      <point x="185" y="264" type="line"/>
+      <point x="540" y="264" type="line"/>
+      <point x="540" y="414" type="line"/>
+      <point x="185" y="414" type="line"/>
+    </contour>
+  </outline>
+  <lib>
+    <dict>
+      <key>com.schriftgestaltung.Glyphs.glyph.leftMetricsKey</key>
+      <string>=I</string>
+      <key>com.schriftgestaltung.Glyphs.glyph.rightMetricsKey</key>
+      <string>=I-30</string>
+      <key>com.schriftgestaltung.Glyphs.layer.leftMetricsKey</key>
+      <string>=L</string>
+      <key>com.schriftgestaltung.Glyphs.layer.rightMetricsKey</key>
+      <string>=L+10</string>
+      <key>public.markColor</key>
+      <string>0.67,0.95,0.38,1</string>
+    </dict>
+  </lib>
+</glyph>

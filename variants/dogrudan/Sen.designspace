@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<designspace format="5.0">
+  <axes>
+    <axis tag="wght" name="Weight" minimum="400" maximum="800" default="400">
+      <map input="400" output="400"/>
+      <map input="500" output="500"/>
+      <map input="600" output="600"/>
+      <map input="700" output="650"/>
+      <map input="800" output="900"/>
+    </axis>
+  </axes>
+  <sources>
+    <source filename="Sen-Regular.ufo" name="Sen Regular" familyname="Sen" stylename="Regular">
+      <lib copy="1"/>
+      <groups copy="1"/>
+      <features copy="1"/>
+      <info copy="1"/>
+      <location>
+        <dimension name="Weight" xvalue="400"/>
+      </location>
+    </source>
+    <source filename="Sen-ExtraBold.ufo" name="Sen ExtraBold" familyname="Sen" stylename="ExtraBold">
+      <location>
+        <dimension name="Weight" xvalue="900"/>
+      </location>
+    </source>
+  </sources>
+  <instances>
+    <instance name="Sen Regular" familyname="Sen" stylename="Regular" filename="instance_ufos/Sen-Regular.ufo">
+      <location>
+        <dimension name="Weight" xvalue="400"/>
+      </location>
+      <lib>
+        <dict>
+          <key>com.schriftgestaltung.export</key>
+          <true/>
+          <key>com.schriftgestaltung.intanceInterpolations</key>
+          <dict>
+            <key>DEFEBCF2-9FF2-4B76-ADC8-AB6BD79F23E7</key>
+            <integer>1</integer>
+          </dict>
+          <key>com.schriftgestaltung.manualInterpolation</key>
+          <false/>
+          <key>com.schriftgestaltung.weight</key>
+          <string>Regular</string>
+          <key>com.schriftgestaltung.width</key>
+          <string>Medium (normal)</string>
+        </dict>
+      </lib>
+    </instance>
+    <instance name="Sen Medium" familyname="Sen" stylename="Medium" filename="instance_ufos/Sen-Medium.ufo">
+      <location>
+        <dimension name="Weight" xvalue="500"/>
+      </location>
+      <lib>
+        <dict>
+          <key>com.schriftgestaltung.export</key>
+          <true/>
+          <key>com.schriftgestaltung.intanceInterpolations</key>
+          <dict>
+            <key>2D992F1A-8218-4049-8E15-5955C72037C9</key>
+            <real>0.2</real>
+            <key>DEFEBCF2-9FF2-4B76-ADC8-AB6BD79F23E7</key>
+            <real>0.8</real>
+          </dict>
+          <key>com.schriftgestaltung.manualInterpolation</key>
+          <false/>
+          <key>com.schriftgestaltung.weight</key>
+          <integer>500</integer>
+          <key>com.schriftgestaltung.width</key>
+          <string>Medium (normal)</string>
+        </dict>
+      </lib>
+    </instance>
+    <instance name="Sen SemiBold" familyname="Sen" stylename="SemiBold" filename="instance_ufos/Sen-SemiBold.ufo">
+      <location>
+        <dimension name="Weight" xvalue="600"/>
+      </location>
+      <lib>
+        <dict>
+          <key>com.schriftgestaltung.export</key>
+          <true/>
+          <key>com.schriftgestaltung.intanceInterpolations</key>
+          <dict>
+            <key>2D992F1A-8218-4049-8E15-5955C72037C9</key>
+            <real>0.4</real>
+            <key>DEFEBCF2-9FF2-4B76-ADC8-AB6BD79F23E7</key>
+            <real>0.6</real>
+          </dict>
+          <key>com.schriftgestaltung.manualInterpolation</key>
+          <false/>
+          <key>com.schriftgestaltung.weight</key>
+          <integer>600</integer>
+          <key>com.schriftgestaltung.width</key>
+          <string>Medium (normal)</string>
+        </dict>
+      </lib>
+    </instance>
+    <instance name="Sen Bold" familyname="Sen" stylename="Bold" filename="instance_ufos/Sen-Bold.ufo">
+      <location>
+        <dimension name="Weight" xvalue="650"/>
+      </location>
+      <lib>
+        <dict>
+          <key>com.schriftgestaltung.export</key>
+          <true/>
+          <key>com.schriftgestaltung.intanceInterpolations</key>
+          <dict>
+            <key>2D992F1A-8218-4049-8E15-5955C72037C9</key>
+            <real>0.5</real>
+            <key>DEFEBCF2-9FF2-4B76-ADC8-AB6BD79F23E7</key>
+            <real>0.5</real>
+          </dict>
+          <key>com.schriftgestaltung.manualInterpolation</key>
+          <false/>
+          <key>com.schriftgestaltung.weight</key>
+          <integer>700</integer>
+          <key>com.schriftgestaltung.width</key>
+          <string>Medium (normal)</string>
+        </dict>
+      </lib>
+    </instance>
+    <instance name="Sen ExtraBold" familyname="Sen" stylename="ExtraBold" filename="instance_ufos/Sen-ExtraBold.ufo">
+      <location>
+        <dimension name="Weight" xvalue="900"/>
+      </location>
+      <lib>
+        <dict>
+          <key>com.schriftgestaltung.export</key>
+          <true/>
+          <key>com.schriftgestaltung.intanceInterpolations</key>
+          <dict>
+            <key>2D992F1A-8218-4049-8E15-5955C72037C9</key>
+            <integer>1</integer>
+          </dict>
+          <key>com.schriftgestaltung.manualInterpolation</key>
+          <false/>
+          <key>com.schriftgestaltung.weight</key>
+          <integer>800</integer>
+          <key>com.schriftgestaltung.width</key>
+          <string>Medium (normal)</string>
+        </dict>
+      </lib>
+    </instance>
+  </instances>
+  <lib>
+    <dict>
+      <key>GSDimensionPlugin.Dimensions</key>
+      <dict>
+        <key>2D992F1A-8218-4049-8E15-5955C72037C9</key>
+        <dict>
+          <key>HH</key>
+          <integer>165</integer>
+          <key>HV</key>
+          <integer>187</integer>
+          <key>OH</key>
+          <integer>175</integer>
+          <key>OV</key>
+          <integer>192</integer>
+          <key>nV</key>
+          <integer>172</integer>
+          <key>nd</key>
+          <integer>168</integer>
+          <key>oH</key>
+          <integer>165</integer>
+          <key>oV</key>
+          <integer>185</integer>
+        </dict>
+        <key>DEFEBCF2-9FF2-4B76-ADC8-AB6BD79F23E7</key>
+        <dict>
+          <key>HH</key>
+          <integer>85</integer>
+          <key>HV</key>
+          <integer>90</integer>
+          <key>OH</key>
+          <integer>88</integer>
+          <key>OV</key>
+          <integer>92</integer>
+          <key>nV</key>
+          <integer>82</integer>
+          <key>nd</key>
+          <integer>80</integer>
+          <key>oH</key>
+          <integer>80</integer>
+          <key>oV</key>
+          <integer>85</integer>
+        </dict>
+      </dict>
+    </dict>
+  </lib>
+</designspace>

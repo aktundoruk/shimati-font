@@ -1,0 +1,274 @@
+{
+ "dogrudan": {
+  "Regular": {
+   "xHeight": 500,
+   "targets": {
+    "stem": 82.0,
+    "oside": 85.0,
+    "otop": 80.0
+   },
+   "a": {
+    "inter_weight_x": 408,
+    "inter_weight_y": 408,
+    "scale_x": 0.4472,
+    "scale_y": 0.4472,
+    "width": 515,
+    "lsb": 40,
+    "rsb": 70,
+    "bbox": [
+     40,
+     -12,
+     445,
+     506
+    ],
+    "points": [
+     30,
+     13
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      107,
+      82
+     ],
+     "vruns@center": [
+      70,
+      68,
+      71
+     ]
+    }
+   },
+   "e": {
+    "inter_weight_x": 408,
+    "inter_weight_y": 408,
+    "scale_x": 0.4472,
+    "scale_y": 0.4472,
+    "width": 534,
+    "lsb": 46,
+    "rsb": 44,
+    "bbox": [
+     46,
+     -11,
+     490,
+     506
+    ],
+    "points": [
+     21,
+     7
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      82
+     ],
+     "vruns@center": [
+      73,
+      68,
+      72
+     ]
+    }
+   }
+  },
+  "ExtraBold": {
+   "xHeight": 510,
+   "targets": {
+    "stem": 172.0,
+    "oside": 185.0,
+    "otop": 165.0
+   },
+   "a": {
+    "inter_weight_x": 844,
+    "inter_weight_y": 844,
+    "scale_x": 0.4562,
+    "scale_y": 0.4562,
+    "width": 553,
+    "lsb": 25,
+    "rsb": 49,
+    "bbox": [
+     25,
+     -9,
+     504,
+     516
+    ],
+    "points": [
+     30,
+     13
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      203,
+      170
+     ],
+     "vruns@center": [
+      100,
+      99,
+      119
+     ]
+    }
+   },
+   "e": {
+    "inter_weight_x": 844,
+    "inter_weight_y": 844,
+    "scale_x": 0.4562,
+    "scale_y": 0.4562,
+    "width": 564,
+    "lsb": 30,
+    "rsb": 29,
+    "bbox": [
+     30,
+     -9,
+     535,
+     516
+    ],
+    "points": [
+     21,
+     7
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      166
+     ],
+     "vruns@center": [
+      122,
+      97,
+      122
+     ]
+    }
+   }
+  }
+ },
+ "uyarlanmis": {
+  "Regular": {
+   "xHeight": 500,
+   "targets": {
+    "stem": 82.0,
+    "oside": 85.0,
+    "otop": 80.0
+   },
+   "a": {
+    "inter_weight_x": 373,
+    "inter_weight_y": 464,
+    "scale_x": 0.4878,
+    "scale_y": 0.4472,
+    "width": 564,
+    "lsb": 43,
+    "rsb": 85,
+    "bbox": [
+     43,
+     -16,
+     479,
+     510
+    ],
+    "points": [
+     30,
+     13
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      116,
+      83
+     ],
+     "vruns@center": [
+      80,
+      70,
+      81
+     ]
+    }
+   },
+   "e": {
+    "inter_weight_x": 389,
+    "inter_weight_y": 464,
+    "scale_x": 0.4771,
+    "scale_y": 0.4472,
+    "width": 569,
+    "lsb": 50,
+    "rsb": 48,
+    "bbox": [
+     50,
+     -15,
+     521,
+     510
+    ],
+    "points": [
+     21,
+     7
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      84
+     ],
+     "vruns@center": [
+      83,
+      72,
+      82
+     ]
+    }
+   }
+  },
+  "ExtraBold": {
+   "xHeight": 510,
+   "targets": {
+    "stem": 172.0,
+    "oside": 185.0,
+    "otop": 165.0
+   },
+   "a": {
+    "inter_weight_x": 866,
+    "inter_weight_y": 1122,
+    "scale_x": 0.4443,
+    "scale_y": 0.4562,
+    "width": 569,
+    "lsb": 28,
+    "rsb": 70,
+    "bbox": [
+     28,
+     -12,
+     499,
+     525
+    ],
+    "points": [
+     30,
+     13
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      267,
+      171
+     ],
+     "vruns@center": [
+      130,
+      114,
+      158
+     ]
+    }
+   },
+   "e": {
+    "inter_weight_x": 874,
+    "inter_weight_y": 1122,
+    "scale_x": 0.4645,
+    "scale_y": 0.4562,
+    "width": 586,
+    "lsb": 35,
+    "rsb": 33,
+    "bbox": [
+     35,
+     -15,
+     553,
+     525
+    ],
+    "points": [
+     21,
+     7
+    ],
+    "measured": {
+     "stem@0.4xh": [
+      175
+     ],
+     "vruns@center": [
+      160,
+      114,
+      162
+     ]
+    }
+   }
+  }
+ }
+}

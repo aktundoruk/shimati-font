@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="Eth" format="2">
+  <advance width="751"/>
+  <unicode hex="00D0"/>
+  <anchor x="380" y="335" name="center"/>
+  <anchor x="320" y="670" name="top"/>
+  <outline>
+    <contour>
+      <point x="26" y="261" type="line"/>
+      <point x="327" y="261" type="line"/>
+      <point x="327" y="411" type="line"/>
+      <point x="26" y="411" type="line"/>
+    </contour>
+    <component base="D"/>
+  </outline>
+  <lib>
+    <dict>
+      <key>com.schriftgestaltung.Glyphs.shapeOrder</key>
+      <string>PC</string>
+      <key>public.markColor</key>
+      <string>0.67,0.95,0.38,1</string>
+    </dict>
+  </lib>
+</glyph>

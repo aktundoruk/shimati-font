@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<glyph name="iacute" format="2">
+  <advance width="301"/>
+  <unicode hex="00ED"/>
+  <anchor x="216" y="0" name="ogonek"/>
+  <anchor x="235" y="720" name="top"/>
+  <outline>
+    <component base="idotless"/>
+    <component base="acutecomb" xOffset="53"/>
+  </outline>
+  <lib>
+    <dict>
+      <key>com.schriftgestaltung.Glyphs.glyph.leftMetricsKey</key>
+      <string>=i</string>
+      <key>com.schriftgestaltung.Glyphs.layer.leftMetricsKey</key>
+      <string>=n-30</string>
+      <key>public.markColor</key>
+      <string>0.67,0.95,0.38,1</string>
+    </dict>
+  </lib>
+</glyph>
