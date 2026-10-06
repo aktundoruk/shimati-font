@@ -267,6 +267,79 @@ def build_straight(sen, variant):
     return log
 
 
+def _spacing(sen, name):
+    x0, _, x1, _ = ink(SenGlyph(sen, name))
+    return x0, sen[name].width - x1
+
+
+def respace_spacing_mark(sen, name, old_spacing):
+    """Aralıklı aksan glifi (¸ ˙ ˘): bileşeni, Sen'deki sol/sağ boşluk korunacak şekilde kaydırır."""
+    lsb, rsb = old_spacing
+    g = sen[name]
+    c = g.components[0]
+    c.transformation = (1, 0, 0, 1, 0, 0)
+    nx0, _, nx1, _ = ink(SenGlyph(sen, name))
+    c.transformation = (1, 0, 0, 1, round(lsb - nx0), 0)
+    g.width = round(lsb + nx1 - nx0 + rsb)
+    base = {a.name: a.x for a in sen[c.baseGlyph].anchors}
+    for a in g.anchors:
+        a.x = round(base.get(a.name, a.x) + lsb - nx0)
+
+
+def mark_weight(sen):
+    """Aksanların Inter ağırlığı: Inter n gövdesi Sen n gövdesine eşit olduğunda (eş yönlü)."""
+    return solve(lambda t: stem_n(InterGlyph("n").at(t, t), INTER_XH) * sen.info.xHeight / INTER_XH,
+                 stem_n(SenGlyph(sen, "n"), sen.info.xHeight))
+
+
+def inter_mark(sen, char, t, cx):
+    """Inter aksanı: x-height'e göre ölçeklenir, x-height üstündeki boşluğu Inter'deki gibi kalır,
+    mürekkebi yatayda `cx`'e ortalanır."""
+    s = sen.info.xHeight / INTER_XH
+    xh = sen.info.xHeight
+    g = transform(InterGlyph(char).at(t, t), s, 1, lambda y: xh + (y - INTER_XH) * s, 0)
+    x0, _, x1, _ = ink(g)
+    return transform(g, 1, 1, lambda y: y, cx - (x0 + x1) / 2)
+
+
+def build_marks(sen):
+    """i/j noktası, nokta aksanı (İ ċ ė ġ ż, Türkçe i) ve kısa şapka (Ğ ğ Ă ă Ŭ ŭ) Inter'den.
+
+    Sen'de i'nin kendi noktası ile nokta aksanı farklı boydaydı (Türkçe i aksanlıyı kullanıyor);
+    artık tek nokta. Ağırlık Inter'in harf/aksan oranını korur; bağlanma çapaları değişmez.
+    """
+    t = mark_weight(sen)
+    log = {"inter_weight": round(400 + t * 500)}
+    spacing = {n: _spacing(sen, n) for n in ("dotaccent", "breve")}
+    for name, char in (("dotaccentcomb", "\u0307"), ("brevecomb", "\u0306")):
+        g = sen[name]
+        old = [round(v) for v in ink(SenGlyph(sen, name))]
+        ax = next(a.x for a in g.anchors if a.name == "_top")
+        new = inter_mark(sen, char, t, ax)
+        write_outline(g, new)
+        nb = ink(new)
+        for a in g.anchors:
+            if a.name == "top":
+                a.y = round(nb[3])
+        log[name] = {"old": old, "new": [round(v) for v in nb]}
+    for name in ("dotaccent", "breve"):
+        respace_spacing_mark(sen, name, spacing[name])
+    # i ve j'nin kendi noktaları: i'de gövde ortasına, j'de eski noktanın yerine
+    bx0, _, bx1, _ = ink(SenGlyph(sen, "idotless"))
+    for name, cx in (("i", (bx0 + bx1) / 2), ("j", None)):
+        g = sen[name]
+        dot = g.contours[0]
+        xs = [p.x for p in dot.points if p.type]
+        ys = [p.y for p in dot.points if p.type]
+        old = [min(xs), min(ys), max(xs), max(ys)]
+        if cx is None:
+            cx = (min(xs) + max(xs)) / 2
+        g.clearContours()
+        inter_mark(sen, "\u0307", t, cx).draw(SegmentToPointPen(g.getPointPen()))
+        log[name] = {"old": old, "new": [round(v) for v in ink(OpsGlyph(inter_mark(sen, "\u0307", t, cx).ops))]}
+    return log
+
+
 def build_cedilla(sen, variant):
     """Çengel: Inter'in daha kısa, kompakt çengel şekli; kalınlık ve bağlanma noktası Sen'den.
 
@@ -279,6 +352,7 @@ def build_cedilla(sen, variant):
     old = SenGlyph(sen, "cedillacomb")
     neck_y = -10
     old_depth = ink(old)[1]
+    old_spacing = _spacing(sen, "cedilla")
 
     def neck(g):
         return runs_at_y(contours_of(g), neck_y / s if g is not old else neck_y)[-1]
@@ -304,14 +378,7 @@ def build_cedilla(sen, variant):
     g = sen["cedillacomb"]
     write_outline(g, final)
     # aralıklı cedilla (¸): Sen'deki sol/sağ boşluk korunur
-    sp = sen["cedilla"]
-    ox0, _, ox1, _ = ink(SenGlyph(sen, "cedilla"))
-    lsb, rsb = ox0, sp.width - ox1
-    nx0, _, nx1, _ = ink(final)
-    sp.components[0].transformation = (1, 0, 0, 1, round(lsb - nx0), 0)
-    sp.width = round(lsb + nx1 - nx0 + rsb)
-    for a in sp.anchors:
-        a.x = round(a.x + lsb - nx0)
+    respace_spacing_mark(sen, "cedilla", old_spacing)
     P = contours_of(SenGlyph(sen, "cedillacomb"))
     return {"inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
             "scale": round(s, 4), "depth": [round(old_depth), round(ink(final)[1])],
@@ -345,6 +412,7 @@ def harmonize(variant):
         fonts[m] = sen
         straight_log = build_straight(sen, variant)
         cedilla_log = build_cedilla(sen, variant)
+        marks_log = build_marks(sen)
         cuts = sen_cut_lengths(sen)
         params = {}
         xh = sen.info.xHeight
@@ -371,6 +439,7 @@ def harmonize(variant):
         log[m] = {"xHeight": xh, "targets": {k: round(v, 1) if isinstance(v, float) else v for k, v in tgt.items() if k in ("stem", "oside", "otop", "etop")}}
         log[m]["straight"] = straight_log
         log[m]["cedilla"] = cedilla_log
+        log[m]["marks"] = marks_log
 
         for name in "ae":
             ig = inter[name]
@@ -472,6 +541,7 @@ def harmonize(variant):
             orig = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
             build_straight(orig, variant)
             build_cedilla(orig, variant)
+            build_marks(orig)
             log[m]["straight_kerning"] = remap_straight_kerning(sen)
             remap_straight_kerning(orig)
             log[m]["spacing"] = respace(orig, sen, ("a", "e", "ae"))

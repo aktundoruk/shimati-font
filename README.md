@@ -1,6 +1,6 @@
-# Deneme: Inter'den a, e, I, ı ve çengel → Sen
+# Deneme: Inter'den a, e, I, ı, çengel, nokta ve kısa şapka → Sen
 
-Inter 4.1'in `a`, `e`, `I`, `ı` gliflerini ve çengelini (`Ç ç Ş ş Ţ ţ`) Sen'in iki masterına (Regular 400, ExtraBold) uyarlama denemesi.
+Inter 4.1'in `a`, `e`, `I`, `ı` gliflerini, çengelini (`Ç ç Ş ş Ţ ţ`), noktasını (`i j İ ċ ė ġ ż`) ve kısa şapkasını (`Ğ ğ Ă ă Ŭ ŭ`) Sen'in iki masterına (Regular 400, ExtraBold) uyarlama denemesi.
 Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 
 ## Çalıştırma
@@ -50,6 +50,12 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
   bağlanma noktası (boyun ortası aynı `_bottom` çapasına). ExtraBold'da kase için Inter Black'in ötesine
   y ≈ 2.1 ekstrapolasyon gerekiyor (`CEDILLA_TY_CAP` = 2.2). Inter'in Regular'ında boyunda bir köşe
   noktası eksik; `_match_ops` doğruyu bölerek nokta yapısını Black'e eşitler.
+- Nokta ve kısa şapka (`build_marks`): `dotaccentcomb`, `brevecomb` ve `i`/`j`'nin kendi noktaları
+  Inter'den. Ağırlık, Inter `n` gövdesinin Sen `n` gövdesine eşit olduğu ağırlık (Inter'in harf/aksan oranı
+  korunur, bu yüzden Sen'inkinden küçük/ince); x-height üstündeki boşluk Inter'deki gibi ölçeklenir; aksanlar
+  eski çapanın üstüne ortalanır, `i`'nin noktası gövdenin ortasına. Sen'de `i`'nin noktası (136 / 215) ile
+  nokta aksanı (126 / 152; Türkçe `i` ve `İ` bunu kullanıyor) farklıydı, artık tek nokta (112 / 174).
+  ExtraBold'da `İ` noktası bu yüzden biraz büyüdü (152 → 174), `i`'ninki küçüldü (215 → 174).
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
 ## Açık konular
