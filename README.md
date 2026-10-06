@@ -1,4 +1,19 @@
-# Deneme: Inter'den a, e, I, ı, çengel, nokta ve kısa şapka → Sen
+# Shimati
+
+Doruk Aktun'un ilk yazı karakteri: arayüzler ve uzun metinler için değişken ağırlıklı (400–800), Türkçeye
+özenle çizilmiş bir grotesk. Sürüm 1.000, SIL Open Font License 1.1.
+
+- Kurulum dosyaları: [`dist/Shimati/`](dist/Shimati/KURULUM.md) — masaüstü (değişken TTF, 5 ağırlık OTF/TTF),
+  web (WOFF2 + CSS); tek paket: `dist/Shimati-1.000.zip`
+- Tanıtım sayfası: [`specimen/index.html`](specimen/index.html)
+- Ad: Akkadca *šīmāti*, "kaderler"; Mezopotamya mitolojisindeki Kader Tableti'nden (*ṭuppi šīmāti*).
+
+Aşağısı geliştirme notları: font, iki OFL fontun (Sen ve Inter) birleştirilip uyumlu hâle getirilmesiyle
+betiklerle üretiliyor.
+
+---
+
+## Başlangıç: Inter'den a, e, I, ı, çengel, nokta ve kısa şapka → Sen
 
 Inter 4.1'in `a`, `e`, `I`, `ı` gliflerini, çengelini (`Ç ç Ş ş Ţ ţ`), noktasını (`i j İ ċ ė ġ ż`) ve kısa şapkasını (`Ğ ğ Ă ă Ŭ ŭ`) Sen'in iki masterına (Regular 400, ExtraBold) uyarlama denemesi.
 Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
