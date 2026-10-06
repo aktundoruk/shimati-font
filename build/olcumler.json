@@ -201,6 +201,30 @@
       82
      ]
     }
+   },
+   "ae": {
+    "inter_weight_x": 381,
+    "inter_weight_y": 464,
+    "scale_x": 0.4824,
+    "width": 905,
+    "points": [
+     45,
+     11,
+     7
+    ]
+   },
+   "ordfeminine": {
+    "inter_weight_x": 340,
+    "inter_weight_y": 505,
+    "scale": [
+     0.3766,
+     0.3591
+    ],
+    "width": 371,
+    "points": [
+     30,
+     13
+    ]
    }
   },
   "ExtraBold": {
@@ -268,6 +292,30 @@
       162
      ]
     }
+   },
+   "ae": {
+    "inter_weight_x": 870,
+    "inter_weight_y": 1000,
+    "scale_x": 0.4544,
+    "width": 852,
+    "points": [
+     45,
+     11,
+     7
+    ]
+   },
+   "ordfeminine": {
+    "inter_weight_x": 916,
+    "inter_weight_y": 1217,
+    "scale": [
+     0.3567,
+     0.3614
+    ],
+    "width": 384,
+    "points": [
+     30,
+     13
+    ]
    }
   }
  }

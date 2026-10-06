@@ -22,13 +22,18 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 - Yatay kalınlık: Inter `o` üst kalınlığı Sen `o` üst kalınlığına eşit; a/e Inter'in kendi oranlarını korur.
 - Overshoot: Inter'in taşma payları Sen `o`'sununkilere eşlenir.
 - Boşluk: Inter'in a/e ile o/n arasındaki oranları, Sen'in o/n değerlerine uygulanır.
-- Aksanlı harfler ve `æ`, `œ` yeni çapalara/genişliklere göre yeniden konumlandırılır.
+- Aksanlı harfler ve `œ` yeni çapalara/genişliklere göre yeniden konumlandırılır.
+- Terminaller Sen gibi dik kesilir (`scripts/terminals.py`). Regular'da kesik uzunluğu Sen'in `c`/`e`
+  kesiğinin en fazla 1.25 katı; ExtraBold'da kesim yeri Regular'daki göreli konumdan alınır, iç kenar
+  dış kenara paralel uzatılır.
+- `æ` artık bileşik değil: Inter'in kendi `æ`'si a/e parametreleriyle uyarlanır (ExtraBold'da y
+  ekstrapolasyonu 1.2 ile sınırlı, yoksa a ile e arasındaki boşluklar kapanıyor).
+- `ª`: Inter `º` → Sen `º` dönüşümü bulunur, aynısı Inter `ª`'ya uygulanır.
 
 ## Açık konular
 
-- **æ**: bileşik (a + e) yapı çift katlı `a` ile çalışmıyor; `a`'nın gövde ucu taban çizgisinde görünüyor. Elle çizilmeli.
-- **Terminaller**: Inter'in `a`/`e` uçları açılı kesik, Sen'in uçları dik kesik. Karakter farkının çoğu buradan geliyor.
+- **ExtraBold terminal iç kenarı**: `a` ve `e`'de dik kesiğin hemen içinde hafif düz bir bölge var; büyük boyutta göz ayarı gerekebilir.
+- **æ tepe birleşimi**: Inter'in tasarımından gelen küçük V çentiği ExtraBold'da belirgin.
 - **ExtraBold yatay kalınlık**: Sen'e eşitlemek için Inter Black'in ötesine ~%45 ekstrapolasyon gerekti (y ağırlığı ≈1122).
   `a`'nın alt iç boşluğu bu yüzden dar.
-- **ª** (ordfeminine) ayrı çizilmiş, hâlâ eski tek katlı `a`.
 - **Kerning**: `R a`, `v a`, `k e` gibi glife özel çiftler eski şekillere göre; gözden geçirilmeli.

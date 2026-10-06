@@ -21,10 +21,19 @@ from fontTools.ttLib import TTFont
 
 sys.path.insert(0, str(Path(__file__).parent))
 from geom import bounds, contours_of, runs_at_x, runs_at_y  # noqa: E402
+from terminals import (  # noqa: E402
+    find_terminals, make_vertical, make_vertical_at, sen_cut_lengths, terminal_rel_x,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 MASTERS = ["Regular", "ExtraBold"]
 INTER_XH = 1118
+# Regular'da dik kesik, Sen'in kesik uzunluğunun en fazla bu katı olabilir (uç daha az kısalır).
+# ExtraBold'da kesik yeri Regular'daki göreli konumdan alınır, uzunluğu Sen'inkinin bu katıdır.
+TERMINAL_K_REGULAR = 1.25
+TERMINAL_K_EXTRABOLD = 1.0
+# æ iki bölmeli ve sıkışık; Black ötesine ekstrapolasyon a ile e arasındaki boşlukları kapatıyor.
+AE_TY_CAP = 1.2
 
 
 class OpsGlyph:
@@ -137,9 +146,12 @@ def harmonize(variant):
     inter = {n: InterGlyph(n) for n in "aeno"}
     log = {}
     fonts = {}
+    term_rel = {}
     for m in MASTERS:
         sen = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
         fonts[m] = sen
+        cuts = sen_cut_lengths(sen)
+        params = {}
         xh = sen.info.xHeight
         sy = xh / INTER_XH
         s_n, s_o, s_a, s_e = (SenGlyph(sen, n) for n in "noae")
@@ -156,7 +168,10 @@ def harmonize(variant):
         }
         o_bounds = ink(s_o)
         os_top, os_bot = o_bounds[3] - xh, o_bounds[1]
-        old = {n: (ink(SenGlyph(sen, n)), sen[n].width, {a.name: (a.x, a.y) for a in sen[n].anchors}) for n in "ae"}
+        old = {
+            n: (ink(SenGlyph(sen, n)), sen[n].width, {a.name: (a.x, a.y) for a in sen[n].anchors})
+            for n in ("a", "e", "ae")
+        }
         log[m] = {"xHeight": xh, "targets": {k: round(v, 1) if isinstance(v, float) else v for k, v in tgt.items() if k in ("stem", "oside", "otop")}}
 
         for name in "ae":
@@ -221,6 +236,9 @@ def harmonize(variant):
             g = sen[name]
             write_outline(g, final)
             g.width = width
+            params[name] = {"tx": tx, "ty": ty, "sx": sx, "sy": sy, "ymap": ymap, "lsb": lsb, "rsb": rsb}
+            if variant == "uyarlanmis":
+                apply_terminals(g, m, cuts, term_rel)
             (ox0, oy0, ox1, oy1), _, oanch = old[name]
             g.clearAnchors()
             for aname, (ax, ay) in oanch.items():
@@ -245,9 +263,83 @@ def harmonize(variant):
                 },
             }
 
+        if variant == "uyarlanmis":
+            log[m]["ae"] = build_ae(sen, params, old["ae"], cuts, term_rel, m)
+            log[m]["ordfeminine"] = build_ordfeminine(sen, cuts, term_rel, m)
         fix_composites(sen, old)
         sen.info.familyName = f"Sen Deneme {variant.capitalize()}"
     return fonts, log
+
+
+def apply_terminals(g, master, cuts, term_rel, scale=1.0):
+    """Glifin açılı terminallerini Sen gibi dik keser (bkz. terminals.py)."""
+    ys = [p.y for c in g.contours for p in c.points if p.type]
+    mid = (max(ys) + min(ys)) / 2
+    for k, (ci, i) in enumerate(find_terminals(g)):
+        kind = "top" if g.contours[ci].points[i].y > mid else "bottom"
+        key = (g.name, k)
+        if master == "Regular":
+            make_vertical(g, ci, i, TERMINAL_K_REGULAR * cuts[kind] * scale)
+            term_rel[key] = terminal_rel_x(g, ci, i)
+        else:
+            xs = [p.x for c in g.contours for p in c.points if p.type]
+            X = min(xs) + term_rel[key] * (max(xs) - min(xs))
+            make_vertical_at(g, ci, i, X, round(TERMINAL_K_EXTRABOLD * cuts[kind] * scale))
+
+
+def build_ae(sen, params, old_ae, cuts, term_rel, master):
+    """Inter'in kendi æ'sini a ve e'nin parametreleriyle uyarlar (bileşik æ yerine)."""
+    ig = InterGlyph("æ")
+    pa, pe = params["a"], params["e"]
+    tx, ty = (pa["tx"] + pe["tx"]) / 2, min(pa["ty"], AE_TY_CAP)
+    sx = (pa["sx"] + pe["sx"]) / 2
+    shaped = transform(ig.at(tx, ty), sx, pa["sy"], pa["ymap"], 0)
+    x0 = ink(shaped)[0]
+    final = transform(shaped, 1, 1, lambda y: y, pa["lsb"] - x0)
+    nx0, _, nx1, _ = ink(final)
+    g = sen["ae"]
+    g.clearComponents()
+    write_outline(g, final)
+    g.width = round(nx1 + pe["rsb"])
+    apply_terminals(g, master, cuts, term_rel)
+    (ox0, _, ox1, _), _, oanch = old_ae
+    g.clearAnchors()
+    for aname, (ax, ay) in oanch.items():
+        g.appendAnchor({"name": aname, "x": round(nx0 + (ax - ox0) / (ox1 - ox0) * (nx1 - nx0)), "y": ay})
+    return {"inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
+            "scale_x": round(sx, 4), "width": g.width, "points": [len(c) for c in g.contours]}
+
+
+def build_ordfeminine(sen, cuts, term_rel, master):
+    """ª: Inter º → Sen º dönüşümünü bulup aynısını Inter ª'ya uygular."""
+    io, ia = InterGlyph("º"), InterGlyph("ª")
+    s_o = SenGlyph(sen, "ordmasculine")
+    so = ink(s_o)
+    s_top, s_side = o_top(s_o), o_side(s_o)
+    i_h = ink(io.at(0, 0))
+    sy = (so[3] - so[1]) / (i_h[3] - i_h[1])
+    ty = solve(lambda t: o_top(io.at(0, t)) * sy, s_top)
+    tx, sx = 0.0, sy
+    for _ in range(6):
+        iw = ink(io.at(tx, ty))
+        sx = (so[2] - so[0]) / (iw[2] - iw[0])
+        tx = solve(lambda t: o_side(io.at(t, ty)) * sx, s_side)
+    dy = so[1] - ink(io.at(tx, ty))[1] * sy
+    src = ia.at(tx, ty)
+    shaped = transform(src, sx, sy, lambda y: y + dy, 0)
+    # boşluk: Inter'deki ª/º oranları, Sen º'nun boşluklarına
+    io_ink, ia_ink = ink(io.at(tx, ty)), ink(src)
+    lsb = (so[0]) * ia_ink[0] / io_ink[0]
+    rsb = (sen["ordmasculine"].width - so[2]) * (ia.advance(tx) - ia_ink[2]) / (io.advance(tx) - io_ink[2])
+    x0 = ink(shaped)[0]
+    final = transform(shaped, 1, 1, lambda y: y, round(lsb) - x0)
+    g = sen["ordfeminine"]
+    write_outline(g, final)
+    g.width = round(ink(final)[2] + rsb)
+    # küçük boyutta kesik uzunluğu: Sen º / o kalınlık oranıyla ölçeklenir
+    apply_terminals(g, master, cuts, term_rel, scale=s_top / o_top(SenGlyph(sen, "o")))
+    return {"inter_weight_x": round(400 + tx * 500), "inter_weight_y": round(400 + ty * 500),
+            "scale": [round(sx, 4), round(sy, 4)], "width": g.width, "points": [len(c) for c in g.contours]}
 
 
 def fix_composites(font, old):
@@ -257,7 +349,7 @@ def fix_composites(font, old):
         bases = [c.baseGlyph for c in g.components]
         if g.name in ("ae", "oe"):
             continue
-        if not g.components or bases[0] not in ("a", "e"):
+        if not g.components or bases[0] not in ("a", "e", "ae"):
             continue
         base = font[bases[0]]
         banch = {a.name: (a.x, a.y) for a in base.anchors}
@@ -280,15 +372,16 @@ def fix_composites(font, old):
             g.appendAnchor({"name": an, "x": round(x), "y": round(y)})
 
     (oa_ink, oa_w, _), (oe_ink, oe_w, _) = old["a"], old["e"]
-    # æ: e'nin a'nın sağ gövdesine binme miktarını koru
+    # æ (bileşikse): e'nin a'nın sağ gövdesine binme miktarını koru
     ae = font["ae"]
-    ce = next(c for c in ae.components if c.baseGlyph == "e")
-    off_old = ce.transformation[4]
-    overlap = oa_ink[2] - (off_old + oe_ink[0])
-    tail = ae.width - (off_old + oe_w)
-    off_new = round(new_a_ink[2] - overlap - new_e_ink[0])
-    ce.transformation = (1, 0, 0, 1, off_new, 0)
-    ae.width = off_new + font["e"].width + tail
+    if ae.components:
+        ce = next(c for c in ae.components if c.baseGlyph == "e")
+        off_old = ce.transformation[4]
+        overlap = oa_ink[2] - (off_old + oe_ink[0])
+        tail = ae.width - (off_old + oe_w)
+        off_new = round(new_a_ink[2] - overlap - new_e_ink[0])
+        ce.transformation = (1, 0, 0, 1, off_new, 0)
+        ae.width = off_new + font["e"].width + tail
     # œ: e'nin mürekkep sol kenarını aynı yerde tut
     oe = font["oe"]
     ce = next(c for c in oe.components if c.baseGlyph == "e")
