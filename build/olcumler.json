@@ -8,6 +8,28 @@
     "otop": 80.0,
     "etop": 80.0
    },
+   "straight": {
+    "I": {
+     "inter_weight": 405,
+     "scale": 0.4497,
+     "stem": 86,
+     "lsb": 81,
+     "rsb": 81,
+     "width": 248
+    },
+    "idotless": {
+     "inter_weight": 408,
+     "scale": 0.4472,
+     "stem": 82,
+     "lsb": 70,
+     "rsb": 70,
+     "width": 222
+    },
+    "i": {
+     "dot_shift": -54,
+     "width": 222
+    }
+   },
    "a": {
     "inter_weight_x": 408,
     "inter_weight_y": 408,
@@ -75,6 +97,28 @@
     "oside": 185.0,
     "otop": 165.0,
     "etop": 141.9
+   },
+   "straight": {
+    "I": {
+     "inter_weight": 856,
+     "scale": 0.4497,
+     "stem": 174,
+     "lsb": 46,
+     "rsb": 46,
+     "width": 266
+    },
+    "idotless": {
+     "inter_weight": 844,
+     "scale": 0.4562,
+     "stem": 172,
+     "lsb": 49,
+     "rsb": 49,
+     "width": 270
+    },
+    "i": {
+     "dot_shift": -64,
+     "width": 270
+    }
    },
    "a": {
     "inter_weight_x": 844,
@@ -145,6 +189,28 @@
     "oside": 85.0,
     "otop": 80.0,
     "etop": 80.0
+   },
+   "straight": {
+    "I": {
+     "inter_weight": 424,
+     "scale": 0.4497,
+     "stem": 90,
+     "lsb": 110,
+     "rsb": 110,
+     "width": 310
+    },
+    "idotless": {
+     "inter_weight": 408,
+     "scale": 0.4472,
+     "stem": 82,
+     "lsb": 85,
+     "rsb": 85,
+     "width": 252
+    },
+    "i": {
+     "dot_shift": -39,
+     "width": 252
+    }
    },
    "a": {
     "inter_weight_x": 373,
@@ -229,6 +295,20 @@
      13
     ]
    },
+   "straight_kerning": [
+    {
+     "pair": "I C",
+     "old": -40,
+     "new": null,
+     "analog": "H C"
+    },
+    {
+     "pair": "I O",
+     "old": -40,
+     "new": null,
+     "analog": "H O"
+    }
+   ],
    "spacing": {
     "a": {
      "lsb": 0,
@@ -301,6 +381,28 @@
     "oside": 185.0,
     "otop": 165.0,
     "etop": 141.9
+   },
+   "straight": {
+    "I": {
+     "inter_weight": 928,
+     "scale": 0.4497,
+     "stem": 187,
+     "lsb": 80,
+     "rsb": 80,
+     "width": 347
+    },
+    "idotless": {
+     "inter_weight": 844,
+     "scale": 0.4562,
+     "stem": 172,
+     "lsb": 70,
+     "rsb": 70,
+     "width": 312
+    },
+    "i": {
+     "dot_shift": -42,
+     "width": 312
+    }
    },
    "a": {
     "inter_weight_x": 866,
@@ -385,6 +487,14 @@
      13
     ]
    },
+   "straight_kerning": [
+    {
+     "pair": "K i",
+     "old": -20,
+     "new": null,
+     "analog": "K n"
+    }
+   ],
    "spacing": {
     "a": {
      "lsb": -8,

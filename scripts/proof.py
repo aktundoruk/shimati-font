@@ -20,6 +20,7 @@ SAMPLES = [
     ("aeaeae nanene ooaa", 72),
     ("ra fa va ka Pa Fa Va Ya av ay ex", 64),
     ("Değerlendirme yarın akşam", 56),
+    ("Işık İzmir ılık IŞIK İNCİ HIH nın lil", 56),
     ("ä â á à ã å ā ą æ é è ê ë ē ė ę ě œ", 44),
 ]
 PARAGRAPH = (
@@ -130,10 +131,16 @@ def main():
             glyph_svg(new, list("naoe"), ghost=direct,
                       label=f"{m} — Uyarlanmış (kesikli çizgi: doğrudan aktarım)")
         )
+    for m in ("Regular", "ExtraBold"):
+        orig = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
+        new = ufoLib2.Font.open(ROOT / f"variants/uyarlanmis/Sen-{m}.ufo")
+        names = ["H", "I", "l", "idotless", "i", "n"]
+        outlines.append(glyph_svg(orig, names, label=f"{m} — Sen orijinal: H I l ı i n"))
+        outlines.append(glyph_svg(new, names, label=f"{m} — Uyarlanmış: H I l ı i n"))
 
     doc = f"""<!doctype html>
 <html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Inter a/e Denemesi</title>
+<title>Inter Harf Denemesi</title>
 <style>
 {faces}
 :root{{--bg:#fbfaf7;--fg:#1d1c1a;--muted:#7a776f;--line:#e4e1d8;--accent:#c4451c;--ghost:#2f6fd6;--card:#fff}}
@@ -166,8 +173,8 @@ th,td{{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}} th{
 ul.notes li{{margin:6px 0;max-width:820px}}
 @media (max-width:640px){{.row{{grid-template-columns:1fr}}}}
 </style></head><body><main>
-<h1>Inter’in a ve e’si → Sen</h1>
-<p class="lede">Aynı metin üç fontla: Sen’in kendisi, Inter’in a/e’sinin yalnızca ölçeklenip konmuş hâli
+<h1>Inter’den a, e, I, ı → Sen</h1>
+<p class="lede">Aynı metin üç fontla: Sen’in kendisi, Inter’in a, e, I ve ı’sının yalnızca ölçeklenip konmuş hâli
 ve Sen’in genişlik, kalınlık, overshoot ve boşluk sistemine göre uyarlanmış hâli. Ağırlığı kaydırıcıyla değiştirin.</p>
 <div class="controls"><label for="w">Ağırlık</label>
 <input id="w" type="range" min="400" max="800" value="400" step="1"><output id="wv">400</output>

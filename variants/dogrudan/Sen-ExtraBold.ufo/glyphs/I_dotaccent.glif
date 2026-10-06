@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="Idotaccent" format="2">
-  <advance width="573"/>
+  <advance width="266"/>
   <unicode hex="0130"/>
-  <anchor x="369" y="10" name="ogonek"/>
-  <anchor x="287" y="870" name="top"/>
+  <anchor x="210" y="10" name="ogonek"/>
+  <anchor x="133" y="870" name="top"/>
   <outline>
     <component base="I"/>
-    <component base="dotaccentcomb" xOffset="131" yOffset="160"/>
+    <component base="dotaccentcomb" xOffset="-23" yOffset="160"/>
   </outline>
   <lib>
     <dict>

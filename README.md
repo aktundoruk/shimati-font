@@ -1,6 +1,6 @@
-# Deneme: Inter'in a ve e'si → Sen
+# Deneme: Inter'den a, e, I, ı → Sen
 
-Inter 4.1'in küçük `a` ve `e` gliflerini Sen'in iki masterına (Regular 400, ExtraBold) uyarlama denemesi.
+Inter 4.1'in `a`, `e`, `I` ve `ı` gliflerini Sen'in iki masterına (Regular 400, ExtraBold) uyarlama denemesi.
 Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 
 ## Çalıştırma
@@ -37,9 +37,21 @@ Her iki font da OFL-1.1, ayrılmış font adı yok; sonuç da OFL kalır.
 - Kerning (`scripts/kerning.py`): x-height bölgesinde derinliği kırpılmış ortalama boşluk eski
   glifle eşitlenir. Sıkıştırma serbest; gevşetme yalnızca gerçek çarpışmada (en dar boşluk
   eskisinin %60'ının altına inerse) ve onu giderecek kadar. Yeni çift yalnızca |değer| ≥ 30 ise eklenir.
+- `I` ve `ı` (`build_straight`): Inter'de ikisi de düz dikdörtgen. Gövde Sen'in `H` / `n` gövdesine
+  (90 / 187, 82 / 172), boşluklar `H` / `n`'nin sol boşluğuna eşitlenir (Inter'de oran 1:1). Sonuç: Sen'in
+  `I` serifleri ve `ı` bayrağı kalkar; yeni `ı` Sen'in `l`'sinin x-height'te kesilmiş hâli olur.
+  `i`, `ı` + nokta olduğu için o da bayraksız olur; nokta gövdenin ortasına alınır. `İ`, `í`, `į`, `Į`, `ij`,
+  `IJ` vb. bileşikler çapalara göre yeniden kurulur (aksanların dikey konumu Sen'deki gibi kalır).
+- `I`/`ı`/`i` içeren kerning çiftleri aynı profildeki harfin çiftine eşitlenir (`I` → `H`, sağda `ı`/`i` → `n`,
+  solda → `l`); karşılığı yoksa silinir (`I C`, `I O`, ExtraBold `K i`). a/e kerning'i yeni `I`/`ı` ile ölçülür.
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
 ## Açık konular
+
+- **`I` / `l` / `1` ayrımı**: `I` ve `l` artık ikisi de düz çubuk, yalnızca boyları farklı (670 / 720).
+  Arayüzde (kodlar, şifreler, "Il") karışabilir. Inter bu yüzden serifli `I` seçeneği sunuyor (cv08).
+- **`j` hâlâ bayraklı**: Sen'in `j`'si (ve `ij`'deki `j`) sol üst bayrağını koruyor; bayraksız `i` ile tutarlı
+  olması için `j` de Inter'den alınabilir.
 
 - **`e`'nin ağzı**: Sen'inkinden ~%25 kapalı (Regular 80 / 108, ExtraBold 47 / 66 birim). ExtraBold'da açılı
   kesik orta çizgiye paralel uzandığı için büyük boyutta yarık gibi görünüyor.

@@ -46,6 +46,13 @@ CUT_TERMINALS = ("top",)
 AE_TY_CAP = 1.2
 # Boşluk düzeltmesi bu nötr harflere göre yapılır (kerning gerektirmeyen ortaklar).
 NEUTRAL_PARTNERS = ["n", "o", "i", "l", "H", "O"]
+# Düz gövdeli harfler: (Inter karakteri, Sen'deki referans harf, yükseklik). Gövde kalınlığı ve
+# boşluklar referans harften alınır; Inter'deki glif/referans boşluk oranı korunur.
+STRAIGHT = {"I": ("I", "H", "capHeight"), "idotless": ("ı", "n", "xHeight")}
+INTER_CAP = 1490
+# Düz harflerin kerning'i bu harflerin kerning'ini izler (I → H; ı/i sağda → n, solda → l).
+KERN_ANALOG_LEFT = {"I": "H", "idotless": "l", "i": "l"}
+KERN_ANALOG_RIGHT = {"I": "H", "idotless": "n", "i": "n"}
 
 
 class OpsGlyph:
@@ -154,6 +161,90 @@ def top_extreme_x(ops_glyph):
     return sum(xs) / len(xs)
 
 
+def left_stem(g, y):
+    return runs_at_y(contours_of(g), y)[0]
+
+
+def build_straight(sen, variant):
+    """I ve ı: Inter'in düz çubuklarını Sen'in gövde kalınlığı ve boşluk sistemine oturtur.
+
+    Inter'de ikisi de dikdörtgen; uyarlanınca gövde Sen'in H / n gövdesine, boşluklar H / n'nin
+    sol boşluğuna (Inter'deki oranla) eşitlenir. Sen'in I serifleri ve ı bayrağı böylece kalkar.
+    """
+    log = {}
+    for name, (char, ref, height) in STRAIGHT.items():
+        ig, iref = InterGlyph(char), InterGlyph(ref)
+        h = getattr(sen.info, height)
+        sy = h / (INTER_CAP if height == "capHeight" else INTER_XH)
+        s_ref = SenGlyph(sen, ref)
+        r_stem = _w(left_stem(s_ref, h * 0.2))
+        r_lsb = ink(s_ref)[0]
+        old_g = SenGlyph(sen, name)
+        old_stem = left_stem(old_g, h * 0.5) if name == "idotless" else runs_at_y(contours_of(old_g), h * 0.5)[0]
+        sx = sy
+        if variant == "dogrudan":
+            t = solve(lambda t: stem_n(InterGlyph("n").at(t, t), INTER_XH) * sy, stem_n(SenGlyph(sen, "n"), sen.info.xHeight))
+            src = ig.at(t, t)
+            i_ink = ink(src)
+            lsb, rsb = i_ink[0] * sx, (ig.advance(t) - i_ink[2]) * sx
+        else:
+            t = solve(lambda t: _w(left_stem(ig.at(t, 0), INTER_XH * 0.2)) * sx, r_stem)
+            src = ig.at(t, 0)
+            i_ink, ir_lsb = ink(src), ink(iref.at(t, 0))[0]
+            lsb = r_lsb * i_ink[0] / ir_lsb
+            rsb = r_lsb * (ig.advance(t) - i_ink[2]) / ir_lsb
+        lsb, rsb = round(lsb), round(rsb)
+        shaped = transform(src, sx, sy, lambda y: y, 0)
+        final = transform(shaped, 1, 1, lambda y: y, lsb - ink(shaped)[0])
+        g = sen[name]
+        oanch = {a.name: (a.x, a.y) for a in g.anchors}
+        write_outline(g, final)
+        nx0, _, nx1, _ = ink(final)
+        g.width = round(nx1 + rsb)
+        # çapalar gövdeye göre taşınır (eski ink kutusu serif/bayrak içerdiği için kullanılmaz)
+        g.clearAnchors()
+        for an, (ax, ay) in oanch.items():
+            nx = nx0 + (ax - old_stem[0]) / _w(old_stem) * (nx1 - nx0)
+            if an == "top":
+                nx = (nx0 + nx1) / 2  # düz gövdede aksan tam ortaya
+            g.appendAnchor({"name": an, "x": round(nx), "y": ay})
+        log[name] = {"inter_weight": round(400 + t * 500), "scale": round(sx, 4),
+                     "stem": round(nx1 - nx0), "lsb": lsb, "rsb": rsb, "width": g.width}
+    # i: idotless + kendi noktası; nokta yeni gövdenin ortasına, genişlik ı'nınki
+    i, base = sen["i"], sen["idotless"]
+    for c in i.components:
+        c.transformation = (1, 0, 0, 1, 0, 0)
+    bx0, _, bx1, _ = ink(SenGlyph(sen, "idotless"))
+    dot = i.contours[0]
+    dxs = [p.x for p in dot.points if p.type]
+    shift = round((bx0 + bx1) / 2 - (min(dxs) + max(dxs)) / 2)
+    for p in dot.points:
+        p.x += shift
+    i.width = base.width
+    i.clearAnchors()
+    for a in base.anchors:
+        i.appendAnchor({"name": a.name, "x": a.x, "y": a.y})
+    log["i"] = {"dot_shift": shift, "width": i.width}
+    fix_composites(sen, None, bases=("I", "idotless", "i"))
+    return log
+
+
+def remap_straight_kerning(font):
+    """I/ı/i içeren çiftleri, aynı profildeki harfin (H, n, l) çiftine eşitler; yoksa siler."""
+    changes = []
+    for (left, right), v in list(font.kerning.items()):
+        analog = (KERN_ANALOG_LEFT.get(left, left), KERN_ANALOG_RIGHT.get(right, right))
+        if analog == (left, right):
+            continue
+        new = font.kerning.get(analog)
+        if new is None:
+            del font.kerning[(left, right)]
+        else:
+            font.kerning[(left, right)] = new
+        changes.append({"pair": f"{left} {right}", "old": v, "new": new, "analog": " ".join(analog)})
+    return changes
+
+
 def harmonize(variant):
     inter = {n: InterGlyph(n) for n in "aeno"}
     log = {}
@@ -162,6 +253,7 @@ def harmonize(variant):
     for m in MASTERS:
         sen = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
         fonts[m] = sen
+        straight_log = build_straight(sen, variant)
         cuts = sen_cut_lengths(sen)
         params = {}
         xh = sen.info.xHeight
@@ -186,6 +278,7 @@ def harmonize(variant):
             for n in ("a", "e", "ae")
         }
         log[m] = {"xHeight": xh, "targets": {k: round(v, 1) if isinstance(v, float) else v for k, v in tgt.items() if k in ("stem", "oside", "otop", "etop")}}
+        log[m]["straight"] = straight_log
 
         for name in "ae":
             ig = inter[name]
@@ -283,7 +376,11 @@ def harmonize(variant):
         if variant == "uyarlanmis":
             log[m]["ae"] = build_ae(sen, params, old["ae"], cuts, term_rel, m)
             log[m]["ordfeminine"] = build_ordfeminine(sen, cuts, term_rel, m)
+            # a/e'nin boşluk ve kerning referansı: Sen'in eski a/e'si, ama yeni I/ı ile
             orig = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
+            build_straight(orig, variant)
+            log[m]["straight_kerning"] = remap_straight_kerning(sen)
+            remap_straight_kerning(orig)
             log[m]["spacing"] = respace(orig, sen, ("a", "e", "ae"))
         fix_composites(sen, old)
         if variant == "uyarlanmis":
@@ -409,27 +506,33 @@ def build_ordfeminine(sen, cuts, term_rel, master):
             "scale": [round(sx, 4), round(sy, 4)], "width": g.width, "points": [len(c) for c in g.contours]}
 
 
-def fix_composites(font, old):
-    """a/e kullanan bileşik glifleri yeni çapalara ve genişliklere göre günceller."""
-    new_a_ink, new_e_ink = ink(SenGlyph(font, "a")), ink(SenGlyph(font, "e"))
-    for g in font:
-        bases = [c.baseGlyph for c in g.components]
-        if g.name in ("ae", "oe"):
+def fix_composites(font, old, bases=("a", "e", "ae", "I", "idotless", "i")):
+    """Değişen temel glifleri kullanan bileşikleri yeni çapalara ve genişliklere göre günceller."""
+    # i önce: iogonek ve ij onun genişliğine bağlı
+    order = sorted(font.keys(), key=lambda n: n != "i")
+    for name in order:
+        g = font[name]
+        if g.name in ("ae", "oe", "IJ", "ij") or not g.components:
             continue
-        if not g.components or bases[0] not in ("a", "e", "ae"):
+        base_c = next((c for c in g.components if c.baseGlyph in bases), None)
+        if base_c is None:
             continue
-        base = font[bases[0]]
+        base = font[base_c.baseGlyph]
+        base_c.transformation = (1, 0, 0, 1, 0, 0)
+        marks = [c for c in g.components if c is not base_c]
         banch = {a.name: (a.x, a.y) for a in base.anchors}
         g.width = base.width
-        for c in g.components[1:]:
+        for c in marks:
             manch = {a.name: (a.x, a.y) for a in font[c.baseGlyph].anchors}
             for an, (mx, my) in manch.items():
                 if an.startswith("_") and an[1:] in banch:
-                    bx, by = banch[an[1:]]
-                    c.transformation = (1, 0, 0, 1, bx - mx, by - my)
+                    # yatay konum çapadan; dikey konum Sen'deki gibi kalır (iogonek'te çapa y'si
+                    # elle düzeltilmiş, çapaya uyunca kanca gövdeden kopuyor)
+                    bx = banch[an[1:]][0]
+                    c.transformation = (1, 0, 0, 1, bx - mx, c.transformation[5])
                     break
         new_anchors = dict(banch)
-        for c in g.components[1:]:
+        for c in marks:
             dx, dy = c.transformation[4], c.transformation[5]
             for a in font[c.baseGlyph].anchors:
                 if not a.name.startswith("_"):
@@ -438,6 +541,26 @@ def fix_composites(font, old):
         for an, (x, y) in new_anchors.items():
             g.appendAnchor({"name": an, "x": round(x), "y": round(y)})
 
+    # IJ, ij: ikinci harf birincinin genişliği kadar sağda
+    for name in ("IJ", "ij"):
+        g = font[name]
+        first, second = g.components
+        off_old = second.transformation[4]
+        off_new = font[first.baseGlyph].width
+        second.transformation = (1, 0, 0, 1, off_new, 0)
+        g.width = off_new + font[second.baseGlyph].width
+        fanch = {a.name: a.x for a in font[first.baseGlyph].anchors}
+        sanch = {a.name: a.x + off_new for a in font[second.baseGlyph].anchors}
+        anchors = [(a.name, a.x, a.y) for a in g.anchors]
+        g.clearAnchors()
+        for an, x, y in anchors:
+            # çapa ikinci harfte varsa ona, yoksa birinciye ait (ij'de top/bottom j'nin)
+            x = sanch.get(an, fanch.get(an, x + off_new - off_old))
+            g.appendAnchor({"name": an, "x": round(x), "y": y})
+
+    if old is None:
+        return
+    new_a_ink, new_e_ink = ink(SenGlyph(font, "a")), ink(SenGlyph(font, "e"))
     (oa_ink, oa_w, _), (oe_ink, oe_w, _) = old["a"], old["e"]
     # æ (bileşikse): e'nin a'nın sağ gövdesine binme miktarını koru
     ae = font["ae"]

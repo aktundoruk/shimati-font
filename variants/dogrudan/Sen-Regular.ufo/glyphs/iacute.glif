@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <glyph name="iacute" format="2">
-  <advance width="301"/>
+  <advance width="222"/>
   <unicode hex="00ED"/>
-  <anchor x="216" y="0" name="ogonek"/>
-  <anchor x="235" y="720" name="top"/>
+  <anchor x="152" y="0" name="ogonek"/>
+  <anchor x="171" y="720" name="top"/>
   <outline>
     <component base="idotless"/>
-    <component base="acutecomb" xOffset="53"/>
+    <component base="acutecomb" xOffset="-11"/>
   </outline>
   <lib>
     <dict>
