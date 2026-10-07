@@ -112,7 +112,8 @@ Fontun çalışma adı **Shimati** (sürüm 1.000, Made by Doruk Aktun).
   Bileşen ofsetleri, çapalar ve kerning de aynı dönüşümle; bağımsız noktalar (i, j, ., ¨, ˙, ÷) yuvarlak
   kalsın diye yalnızca taşınır.
   Kaynak masterda aynı x'te duran ardışık noktalar (dikey kenarlar, dikey teğetler) daraltmadan sonra
-  yeniden hizalanır (`_keep_verticals`); yoksa ExtraBold'un ötesine taşan x ağırlığında, iki masterda farklı
+  yeniden hizalanır (`_keep_verticals`): hiza, iki master arasında en az yer değiştiren noktaya (gerçek kenar)
+  yapılır, ortalamaya değil (ortalama G'nin gövdesini inceltip kuyruktaki içe dönüşü kaybettiriyordu); yoksa ExtraBold'un ötesine taşan x ağırlığında, iki masterda farklı
   dizilmiş noktalar ayrışıp ExtraBold `G`'nin kolunda basamak açıyordu (etkilenen: `G`, `d`, `q`).
 - Aralık (`TRACKING`): Regular'da her yan boşluktan 8 birim çıkarılır; ExtraBold'da daraltma aralığı
   zaten yeterince kıstığı için 0.

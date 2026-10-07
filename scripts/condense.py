@@ -69,11 +69,13 @@ def _dots(glyph, xh):
     return out
 
 
-def _keep_verticals(c, cs):
+def _keep_verticals(c, cs, cr, cb):
     """Kaynak masterda aynı x'te duran ardışık noktaları (dikey kenarlar, dikey teğetler) yeniden
     hizalar. x başka bir ağırlıktan alındığında (özellikle ExtraBold'un ötesine taşarken) iki
     masterda farklı dizilmiş noktalar ayrışıp dikey kenarda basamak açabiliyor (ExtraBold G).
-    İkiden fazla düğüm noktası varsa ortalamaya, tek düğüm varsa tutamaçlar düğümün x'ine."""
+    Hiza, koşudaki düğüm noktalarından iki master arasında en az yer değiştirenin x'ine yapılır: o nokta
+    gerçek kenardır (G'de gövde); çok yer değiştirenler başka bir şeklin (G'de kolun ucu) karşılığıdır.
+    Ortalama almak gövdeyi inceltip G'nin kuyruğundaki içe dönüşü kaybettiriyordu."""
     pts, src = c.points, cs.points
     n = len(pts)
     if n < 2:
@@ -90,7 +92,8 @@ def _keep_verticals(c, cs):
             if len(run) > 1:
                 on = [j for j in run if pts[j].type]
                 if on:
-                    x = round(sum(pts[j].x for j in on) / len(on))
+                    ref = min(on, key=lambda j: abs(cb.points[j].x - cr.points[j].x))
+                    x = pts[ref].x
                     for j in run:
                         if pts[j].x != x:
                             pts[j].x = x
@@ -145,7 +148,7 @@ def condense(R, B, factor, ref=None):
                     continue
                 for p, pr, pb in zip(c.points, cr.points, cb.points):
                     p.x = X(pr.x, pb.x)
-                if _keep_verticals(c, (cr if name == "Regular" else cb)):
+                if _keep_verticals(c, (cr if name == "Regular" else cb), cr, cb):
                     realigned.add(g.name)
             for c, cr, cb in zip(g.components, gr.components, gb.components):
                 xx, xy, yx, yy, dx, dy = c.transformation
