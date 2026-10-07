@@ -1269,7 +1269,8 @@
      82.0
     ],
     "avg_width_ref": 542,
-    "avg_width": 492
+    "avg_width": 492,
+    "dikey_hizalanan": []
    },
    "ExtraBold": {
     "t": 1.193,
@@ -1280,7 +1281,12 @@
      172.0
     ],
     "avg_width_ref": 581,
-    "avg_width": 526
+    "avg_width": 526,
+    "dikey_hizalanan": [
+     "G",
+     "d",
+     "q"
+    ]
    }
   },
   "tracking": {

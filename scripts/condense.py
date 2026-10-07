@@ -69,6 +69,36 @@ def _dots(glyph, xh):
     return out
 
 
+def _keep_verticals(c, cs):
+    """Kaynak masterda aynı x'te duran ardışık noktaları (dikey kenarlar, dikey teğetler) yeniden
+    hizalar. x başka bir ağırlıktan alındığında (özellikle ExtraBold'un ötesine taşarken) iki
+    masterda farklı dizilmiş noktalar ayrışıp dikey kenarda basamak açabiliyor (ExtraBold G).
+    İkiden fazla düğüm noktası varsa ortalamaya, tek düğüm varsa tutamaçlar düğümün x'ine."""
+    pts, src = c.points, cs.points
+    n = len(pts)
+    if n < 2:
+        return 0
+    same = [abs(src[i].x - src[(i + 1) % n].x) <= 0.5 for i in range(n)]
+    if all(same):
+        return 0
+    start = same.index(False) + 1  # bir kopukluktan sonra başla, koşular dolanmasın
+    moved, run = 0, []
+    for k in range(n + 1):
+        i = (start + k) % n
+        run.append(i)
+        if k == n or not same[i]:
+            if len(run) > 1:
+                on = [j for j in run if pts[j].type]
+                if on:
+                    x = round(sum(pts[j].x for j in on) / len(on))
+                    for j in run:
+                        if pts[j].x != x:
+                            pts[j].x = x
+                            moved += 1
+            run = []
+    return moved
+
+
 def _solve_t(f, target, lo, hi):
     for _ in range(50):
         m = (lo + hi) / 2
@@ -99,6 +129,7 @@ def condense(R, B, factor, ref=None):
             return round(s * (xr + t * (xb - xr)))
 
         xh = font.info.xHeight
+        realigned = set()
         for g in font:
             gr, gb = src["Regular"][g.name], src["ExtraBold"][g.name]
             dots = _dots(g, xh)
@@ -114,6 +145,8 @@ def condense(R, B, factor, ref=None):
                     continue
                 for p, pr, pb in zip(c.points, cr.points, cb.points):
                     p.x = X(pr.x, pb.x)
+                if _keep_verticals(c, (cr if name == "Regular" else cb)):
+                    realigned.add(g.name)
             for c, cr, cb in zip(g.components, gr.components, gb.components):
                 xx, xy, yx, yy, dx, dy = c.transformation
                 c.transformation = (xx, xy, yx, yy, X(cr.transformation[4], cb.transformation[4]), dy)
@@ -130,7 +163,8 @@ def condense(R, B, factor, ref=None):
                 font.kerning[pair] = v
         log[name] = {"t": round(t, 3), "weight_x": round(400 + t * 500), "scale_x": round(s, 4),
                      "stem": [round(stem0), _stem(font)],
-                     "avg_width_ref": round(w0), "avg_width": round(_avg_width(font))}
+                     "avg_width_ref": round(w0), "avg_width": round(_avg_width(font)),
+                     "dikey_hizalanan": sorted(realigned)}
     return log
 
 

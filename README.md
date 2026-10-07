@@ -111,6 +111,9 @@ Fontun çalışma adı **Shimati** (sürüm 1.000, Made by Doruk Aktun).
   (Regular: x ağırlığı ≈ 443, ölçek 0.915; ExtraBold: ≈ 996 yani ExtraBold'un %19 ötesi, ölçek 0.908).
   Bileşen ofsetleri, çapalar ve kerning de aynı dönüşümle; bağımsız noktalar (i, j, ., ¨, ˙, ÷) yuvarlak
   kalsın diye yalnızca taşınır.
+  Kaynak masterda aynı x'te duran ardışık noktalar (dikey kenarlar, dikey teğetler) daraltmadan sonra
+  yeniden hizalanır (`_keep_verticals`); yoksa ExtraBold'un ötesine taşan x ağırlığında, iki masterda farklı
+  dizilmiş noktalar ayrışıp ExtraBold `G`'nin kolunda basamak açıyordu (etkilenen: `G`, `d`, `q`).
 - Aralık (`TRACKING`): Regular'da her yan boşluktan 8 birim çıkarılır; ExtraBold'da daraltma aralığı
   zaten yeterince kıstığı için 0.
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
