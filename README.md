@@ -117,6 +117,9 @@ Fontun çalışma adı **Shimati** (sürüm 1.000, Made by Doruk Aktun).
   dizilmiş noktalar ayrışıp ExtraBold `G`'nin kolunda basamak açıyordu (etkilenen: `G`, `d`, `q`).
 - Aralık (`TRACKING`): Regular'da her yan boşluktan 8 birim çıkarılır; ExtraBold'da daraltma aralığı
   zaten yeterince kıstığı için 0.
+- ExtraBold `G` kolu (`build_g_arm`): Sen'de G'nin kolu kalınlaştıkça kısalıp ExtraBold'da sıfıra iniyordu
+  (gövde yukarı çıkıp sola dönmüyordu). Kol, Regular'daki kol / iç boşluk oranıyla (0.44) ExtraBold'a da
+  verildi: 165 / 86 birim; ara ağırlıklar interpole, `Ğ Ġ Ģ` bileşen olarak aynı G'yi kullanır.
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
 ## Çözülen açık konular (6 Ekim 2026)

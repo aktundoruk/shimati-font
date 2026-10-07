@@ -1058,6 +1058,25 @@ def fix_composites(font, old, bases=("a", "e", "ae", "I", "idotless", "i", "jdot
     oe.width = off_new + font["e"].width + tail
 
 
+# ExtraBold G: Sen'de G'nin kolu kalınlaştıkça kısalıp ExtraBold'da sıfıra iniyor (gövde yukarı çıkıyor ama
+# sola dönmüyor). Kol, Regular'daki kol / iç boşluk oranıyla ExtraBold'a da verilir; ara ağırlıklar interpole.
+def build_g_arm(R, B):
+    def parts(f):
+        bowl, bar = f["G"].contours
+        stem, arm, counter = bar.points[5].x, bar.points[3].x, bowl.points[10].x
+        assert bar.points[3].x == bar.points[4].x and bowl.points[10].y == 335, "G'nin nokta yapısı değişmiş"
+        return bar, stem, arm, counter
+
+    _, stem_r, arm_r, counter_r = parts(R)
+    bar_b, stem_b, _, counter_b = parts(B)
+    ratio = (stem_r - arm_r) / (stem_r - counter_r)
+    length = round(ratio * (stem_b - counter_b))
+    for i in (3, 4):
+        bar_b.points[i].x = stem_b - length
+    bar_b.points[4].y = bar_b.points[5].y  # kolun altı yatay
+    return {"oran": round(ratio, 3), "Regular": stem_r - arm_r, "ExtraBold": length}
+
+
 if __name__ == "__main__":
     all_logs = {}
     for variant in ("dogrudan", "uyarlanmis"):
@@ -1065,6 +1084,7 @@ if __name__ == "__main__":
         if variant == "uyarlanmis":
             ref = [ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo") for m in MASTERS]
             log["condense"] = condense(fonts["Regular"], fonts["ExtraBold"], CONDENSE, ref)
+            log["g_kolu"] = build_g_arm(fonts["Regular"], fonts["ExtraBold"])
             log["tracking"] = {m: track(fonts[m], TRACKING[m]) for m in MASTERS}
             log["collision_guard"] = {
                 m: collision_guard(fonts[m], r, log["condense"][m]["scale_x"]) for m, r in zip(MASTERS, ref)}

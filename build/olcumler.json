@@ -1289,6 +1289,11 @@
     ]
    }
   },
+  "g_kolu": {
+   "oran": 0.444,
+   "Regular": 165,
+   "ExtraBold": 86
+  },
   "tracking": {
    "Regular": 8,
    "ExtraBold": 0
