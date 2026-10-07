@@ -130,9 +130,12 @@ Fontun çalışma adı **Shimati** (sürüm 1.000, Made by Doruk Aktun).
   `.cv08` olarak eklendi, `cv08` özelliğiyle açılır (Inter'deki gibi). CSS: `font-feature-settings: 'cv08'`.
 - **`Ŋ ŋ`** (`build_eng_tails`): Sen'in `N`/`n` gövdesi korunur, kanca yeni `j`'nin kuyruğu (Inter `ȷ`), aynı
   gövde genişliği ve alt uzantı. (Inter'in kendi `Ŋ`'si Regular/Black arasında nokta-uyumsuz.)
-- **`e` / `æ` kuyruğu (ExtraBold)**: kesik çok yatıktı (8.6° / 0.7°), kuyruğun üstü çubuğun altında uzun bir
-  yarık yapıyordu. İç uç sabit, dış kenar kısaltılarak kesik 30°'ye dikleştirildi (`steepen_terminal`).
-  Regular'a (14.7°) dokunulmadı.
+- **`e` / `æ` kuyruğu (ExtraBold)**: Inter'in kesiği çok yatıktı (8.6° / 0.7°), kuyruğun üstü çubuğun altında
+  uzun bir yarık yapıyordu. İlk çözüm (iç uç sabit, kesik 30°'ye dikleştirme) kuyruğu fazla kısalttı: uç
+  Regular'da mürekkep yüksekliğinin %25.7'sinde, ExtraBold'da %19'unda bitiyordu; ExtraBold e ailenin geri
+  kalanına göre kısa kuyruklu görünüyordu. Şimdi (`tail_length`, `set_tail_tip`, 7 Ekim 2026) dış uç Regular'ın
+  göreli yüksekliğine taşınıyor, iç uç sabit: kesik e 16.4°, æ 14.2° (Regular 14.7°), kuyruk boyu tüm
+  ağırlıklarda tutarlı.
 - **`æ` tepe çentiği**: Regular 81, ExtraBold 46 birim derinlikteki V, 25 birime indirildi (yalnızca çukur
   noktası kalkar, kontrol noktaları yerinde; yoksa tepe çizgisini aşan tümsek oluşuyor).
 - **ExtraBold `a`'nın alt kasesi**: yatay çizgiler Sen `o`'su (165) yerine Sen `e`'sine (142) eşitlendi;

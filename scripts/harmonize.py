@@ -26,7 +26,7 @@ from condense import condense, track  # noqa: E402
 from kerning import adjust as adjust_kerning, collision_guard, inter_pairs, optical_gap  # noqa: E402
 from terminals import (  # noqa: E402
     _outer_is_in, find_terminals, make_vertical, make_vertical_at, raise_notch, sen_cut_lengths,
-    steepen_terminal, terminal_rel_x, top_notch,
+    set_tail_tip, tail_tip_rel, terminal_rel_x, top_notch,
 )
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -44,9 +44,9 @@ TERMINAL_LENGTH_EXTRABOLD = 0.25
 # Hangi uçlar dik kesilsin: "top" = a'nın (ve æ, ª'nın a kısmının) kemeri, "bottom" = e'nin kuyruğu.
 # e, Inter'in orijinal açılı ucuyla bırakılıyor.
 CUT_TERMINALS = ("top",)
-# ExtraBold'da Inter'in e kuyruğu kesiği çok yatık (e 8.6°, æ 0.7°): kuyruğun üstü çubuğun altında
-# uzun bir yarık oluşturuyor. Kesik en az bu açıya dikleştirilir (Regular 14.7°, dokunulmaz).
-TAIL_MIN_ANGLE_EXTRABOLD = 30
+# ExtraBold'da Inter'in e kuyruğu kesiği çok yatık (e 8.6°, æ 0.7°), uç Regular'dakinden yukarıda bitiyor.
+# Kuyruğun dış ucu, Regular'daki göreli yüksekliğe (mürekkep yüksekliğinin oranı) kısaltılır; böylece kuyruk
+# boyu ağırlıklar arasında tutarlı kalır. (Önceki 30° dikleştirme kuyruğu Regular'a göre kısa bırakıyordu.)
 # æ iki bölmeli ve sıkışık; Black ötesine ekstrapolasyon a ile e arasındaki boşlukları kapatıyor.
 AE_TY_CAP = 1.2
 # æ'nin tepesinde a ile e'nin birleştiği V çentiği (Regular 81, ExtraBold 46 birim) bu derinliğe indirilir.
@@ -684,6 +684,7 @@ def harmonize(variant):
     log = {}
     fonts = {}
     term_rel = {}
+    tail_rel = {}
     for m in MASTERS:
         sen = ufoLib2.Font.open(ROOT / f"sources/Sen-{m}.ufo")
         fonts[m] = sen
@@ -793,8 +794,8 @@ def harmonize(variant):
             params[name] = {"tx": tx, "ty": ty, "sx": sx, "sy": sy, "ymap": ymap, "lsb": lsb, "rsb": rsb}
             if variant == "uyarlanmis":
                 apply_terminals(g, m, cuts, term_rel)
-                if name == "e" and m == "ExtraBold":
-                    log_tail[name] = steepen_terminal(g, TAIL_MIN_ANGLE_EXTRABOLD)
+                if name == "e":
+                    log_tail[name] = tail_length(g, m, tail_rel)
             (ox0, oy0, ox1, oy1), _, oanch = old[name]
             g.clearAnchors()
             for aname, (ax, ay) in oanch.items():
@@ -821,8 +822,7 @@ def harmonize(variant):
 
         if variant == "uyarlanmis":
             log[m]["ae"] = build_ae(sen, params, old["ae"], cuts, term_rel, m)
-            if m == "ExtraBold":
-                log_tail["ae"] = steepen_terminal(sen["ae"], TAIL_MIN_ANGLE_EXTRABOLD)
+            log_tail["ae"] = tail_length(sen["ae"], m, tail_rel)
             log[m]["tail_angle"] = log_tail
             # æ tepesindeki çentik (Inter'in a ile e birleşimi): derinliği AE_NOTCH_MAX ile sınırlı
             n = top_notch(sen["ae"], contours_of, runs_at_x)
@@ -880,6 +880,16 @@ def respace(orig, font, glyphs, min_shift=5):
         out[g] = {"lsb": dl, "rsb": dr}
     _clear_profile_cache()
     return out
+
+
+def tail_length(g, master, tail_rel):
+    """e/æ kuyruğunun boyu: Regular'ın kuyruk ucu yüksekliği (göreli) kaydedilir, ExtraBold'a uygulanır."""
+    if master == "Regular":
+        tail_rel[g.name] = tail_tip_rel(g)
+        return {"uc_yuksekligi": round(tail_rel[g.name], 3)}
+    before = round(tail_tip_rel(g), 3)
+    old, new = set_tail_tip(g, tail_rel[g.name])
+    return {"uc_yuksekligi": [before, round(tail_tip_rel(g), 3)], "kesik_acisi": [old, new]}
 
 
 def _clear_profile_cache():

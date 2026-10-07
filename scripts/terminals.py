@@ -245,12 +245,8 @@ def _bottom_terminal(glyph):
     return max(found)[1:] if found else None
 
 
-def steepen_terminal(glyph, min_deg):
-    """Alt terminalin kesiğini en az `min_deg` derece dikleştirir (e'nin kuyruğu).
-
-    İç uç yerinde kalır; dış kenar, iç uçtan bu açıyla inen doğruyla kesiştiği yerde kısaltılır.
-    Yatık bir kesik kuyruğun üst kenarını çubuğun altında uzun, dar bir yarık gibi uzatıyor;
-    dikleşince ağız sağa doğru açılır. Nokta sayısı değişmez. Döndürür: (eski açı, yeni açı)."""
+def _tail_outer(glyph):
+    """Alt terminalin dış kenarı: (kontur noktaları, değişecek indeksler, dış eğri, iç uç, dış uç tarafı)."""
     ci, i = _bottom_terminal(glyph)
     pts = glyph.contours[ci].points
     N = len(pts)
@@ -259,36 +255,33 @@ def steepen_terminal(glyph, min_deg):
     C_in = [(pts[k].x, pts[k].y) for k in idx_in]
     C_out = [(pts[k].x, pts[k].y) for k in idx_out]
     oin = _outer_is_in(C_in, C_out)
-    outer = C_in if oin else C_out
-    i_tip = C_out[0] if oin else C_in[3]
+    return pts, (idx_in if oin else idx_out), (C_in if oin else C_out), (C_out[0] if oin else C_in[3]), oin
+
+
+def tail_tip_rel(glyph):
+    """Kuyruğun dış ucunun yüksekliği, glifin mürekkep yüksekliğine göre (0 = taban, 1 = tepe)."""
+    _, _, outer, _, oin = _tail_outer(glyph)
+    ys = [p.y for c in glyph.contours for p in c.points]
+    tip = outer[3] if oin else outer[0]
+    return (tip[1] - min(ys)) / (max(ys) - min(ys))
+
+
+def set_tail_tip(glyph, rel):
+    """Kuyruğun dış ucunu, dış kenar boyunca `rel` göreli yüksekliğe taşır (kısaltır ya da uzatır).
+
+    İç uç yerinde kalır, kesiğin açısı buna göre değişir. Ağırlıklar arasında kuyruk boyu tutarlı
+    kalsın diye ExtraBold, Regular'ın oranını alır. Nokta sayısı değişmez. Döndürür: (eski, yeni) kesik açısı."""
+    pts, idx, outer, i_tip, oin = _tail_outer(glyph)
+    ys = [p.y for c in glyph.contours for p in c.points]
+    y = min(ys) + rel * (max(ys) - min(ys))
     o_tip = outer[3] if oin else outer[0]
     old = math.degrees(math.atan2(abs(o_tip[1] - i_tip[1]), abs(o_tip[0] - i_tip[0])))
-    if old >= min_deg:
-        return round(old, 1), round(old, 1)
-    sx = 1 if o_tip[0] > i_tip[0] else -1
-    d = (sx * math.cos(math.radians(min_deg)), -math.sin(math.radians(min_deg)))
-
-    def side(t):
-        p = _pt(outer, t)
-        return (p[0] - i_tip[0]) * d[1] - (p[1] - i_tip[1]) * d[0]
-
-    t = _solve_side(side, 1.0 if oin else 0.0)
+    t = _solve(outer, 1, y, -0.5, 1.5, prefer=1.0 if oin else 0.0)
     new = _split(outer, t)[0] if oin else _split(outer, t)[1]
-    for k, p in zip(idx_in if oin else idx_out, new):
+    for k, p in zip(idx, new):
         pts[k].x, pts[k].y = round(p[0]), round(p[1])
     tip = new[3] if oin else new[0]
     return round(old, 1), round(math.degrees(math.atan2(abs(tip[1] - i_tip[1]), abs(tip[0] - i_tip[0]))), 1)
-
-
-def _solve_side(side, ref, steps=400):
-    """side(t) = 0 kökü, [0, 1]'de `ref`'e en yakını."""
-    ts = [k / steps for k in range(steps + 1)]
-    brackets = [(a, b) for a, b in zip(ts, ts[1:]) if (side(a) < 0) != (side(b) < 0)]
-    a, b = min(brackets, key=lambda ab: abs((ab[0] + ab[1]) / 2 - ref))
-    for _ in range(50):
-        m = (a + b) / 2
-        a, b = (m, b) if (side(a) < 0) == (side(m) < 0) else (a, m)
-    return (a + b) / 2
 
 
 def top_notch(glyph, contours_of, runs_at_x):
