@@ -122,6 +122,14 @@ Fontun çalışma adı **Shimati** (sürüm 1.000, Made by Doruk Aktun).
   verildi: 165 / 86 birim; ara ağırlıklar interpole, `Ğ Ġ Ģ` bileşen olarak aynı G'yi kullanır.
 - PNG proof'ları HarfBuzz + FreeType ile dizilir (`scripts/hbrender.py`), yani kerning görünür.
 
+## Eklenen işaretler: λ Ω → (25 Ekim 2026)
+
+Sen'de yoktu; Inter'den alındı (`build_symbols`), her biri Sen'deki bir akrabasına göre uyarlandı:
+- **`Ω`** ← `O`: genişlik oranı, yan ve üst kalınlık, üst taşma Sen `O`'sundan; boşluklar `O`'nunkiler × Inter'deki Ω/O oranı.
+- **`λ`** ← `v`: genişlik oranı ve çapraz kalınlığı `v`'den, x yüksekliği üstü Sen `l`'sinin yüksekliğine.
+- **`→`** ← kısa çizgi: gövde kalınlığı Sen'in kısa çizgisine (Inter'deki ok/çizgi oranıyla). Dikey konum Inter'in
+  (gövdeyi Sen'in alçak kısa çizgisine ortalamak ok başını tabanın altına sarkıtıyordu).
+
 ## Çözülen açık konular (6 Ekim 2026)
 
 - **`₺`** eklendi (`build_lira`): Inter'den; gövde Sen `L`'sine, alt kavis `U`'suna; ölçek Sen/Inter rakam

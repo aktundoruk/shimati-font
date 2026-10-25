@@ -144,6 +144,26 @@
     "rsb": 55,
     "width": 549
    },
+   "symbols": {
+    "Omega": {
+     "inter_weight": [
+      370,
+      456
+     ],
+     "scale_x": 0.5371,
+     "width": 811
+    },
+    "lambda": {
+     "inter_weight": 387,
+     "scale_x": 0.4927,
+     "width": 628
+    },
+    "arrowright": {
+     "inter_weight": 526,
+     "shaft": 90,
+     "width": 866
+    }
+   },
    "a": {
     "inter_weight_x": 408,
     "inter_weight_y": 408,
@@ -347,6 +367,26 @@
     "lsb": 53,
     "rsb": 45,
     "width": 623
+   },
+   "symbols": {
+    "Omega": {
+     "inter_weight": [
+      858,
+      1006
+     ],
+     "scale_x": 0.4842,
+     "width": 792
+    },
+    "lambda": {
+     "inter_weight": 866,
+     "scale_x": 0.4794,
+     "width": 697
+    },
+    "arrowright": {
+     "inter_weight": 1016,
+     "shaft": 150,
+     "width": 876
+    }
    },
    "a": {
     "inter_weight_x": 844,
@@ -553,6 +593,26 @@
     "lsb": 41,
     "rsb": 41,
     "width": 550
+   },
+   "symbols": {
+    "Omega": {
+     "inter_weight": [
+      370,
+      456
+     ],
+     "scale_x": 0.5371,
+     "width": 811
+    },
+    "lambda": {
+     "inter_weight": 387,
+     "scale_x": 0.4927,
+     "width": 628
+    },
+    "arrowright": {
+     "inter_weight": 526,
+     "shaft": 90,
+     "width": 866
+    }
    },
    "a": {
     "inter_weight_x": 373,
@@ -963,6 +1023,26 @@
     "lsb": 51,
     "rsb": 51,
     "width": 600
+   },
+   "symbols": {
+    "Omega": {
+     "inter_weight": [
+      858,
+      1006
+     ],
+     "scale_x": 0.4842,
+     "width": 792
+    },
+    "lambda": {
+     "inter_weight": 866,
+     "scale_x": 0.4794,
+     "width": 697
+    },
+    "arrowright": {
+     "inter_weight": 1016,
+     "shaft": 150,
+     "width": 876
+    }
    },
    "a": {
     "inter_weight_x": 866,

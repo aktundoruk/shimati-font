@@ -460,6 +460,9 @@
       <string>ogonek</string>
       <string>tt</string>
       <string>liraTurkish</string>
+      <string>Omega</string>
+      <string>lambda</string>
+      <string>arrowright</string>
     </array>
     <key>public.postscriptNames</key>
     <dict>

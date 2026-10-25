@@ -166,6 +166,8 @@
     <string>O_hungarumlaut.glif</string>
     <key>Omacron</key>
     <string>O_macron.glif</string>
+    <key>Omega</key>
+    <string>O_mega.glif</string>
     <key>Oslash</key>
     <string>O_slash.glif</string>
     <key>Otilde</key>
@@ -284,6 +286,8 @@
     <string>approxequal.glif</string>
     <key>aring</key>
     <string>aring.glif</string>
+    <key>arrowright</key>
+    <string>arrowright.glif</string>
     <key>asciicircum</key>
     <string>asciicircum.glif</string>
     <key>asciitilde</key>
@@ -496,6 +500,8 @@
     <string>l.glif</string>
     <key>lacute</key>
     <string>lacute.glif</string>
+    <key>lambda</key>
+    <string>lambda.glif</string>
     <key>lcaron</key>
     <string>lcaron.glif</string>
     <key>lcommaaccent</key>

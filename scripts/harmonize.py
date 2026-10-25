@@ -554,6 +554,103 @@ def build_lira(sen, variant):
             "scale_x": round(sx, 4), "lsb": round(lsb), "rsb": round(rsb), "width": g.width}
 
 
+def _new_glyph(sen, name, uni, outline, width):
+    if name not in sen:
+        sen.newGlyph(name)
+        sen.lib["public.glyphOrder"].append(name)
+    g = sen[name]
+    g.unicodes = [uni]
+    write_outline(g, outline)
+    g.width = round(width)
+    return g
+
+
+def _fit(sen, src, sx, sy, ymap, lsb, rsb):
+    shaped = transform(src, sx, sy, ymap, 0)
+    final = transform(shaped, 1, 1, lambda y: y, round(lsb) - ink(shaped)[0])
+    return final, ink(final)[2] + round(rsb)
+
+
+def _ratio_sb(sen, sen_ref, i_ref, ig, tx):
+    """Boşluklar: Sen'deki referans harfin boşlukları × Inter'deki glif/referans boşluk oranı."""
+    s_ink, i_ink, r_ink = ink(SenGlyph(sen, sen_ref)), ink(ig.at(tx, tx)), ink(i_ref.at(tx, tx))
+    s_l, s_r = s_ink[0], sen[sen_ref].width - s_ink[2]
+    lsb = s_l * i_ink[0] / r_ink[0]
+    rsb = s_r * (ig.advance(tx) - i_ink[2]) / (i_ref.advance(tx) - r_ink[2])
+    return lsb, rsb
+
+
+def build_symbols(sen):
+    """Sen'de olmayan Ω, λ ve → Inter'den, her biri Sen'deki bir akrabasına göre uyarlanır:
+    Ω ← O (genişlik, yan ve üst kalınlık, taşma), λ ← v (genişlik, çapraz kalınlığı, yükseklik l'ye),
+    → ← kısa çizgi (gövde kalınlığı; dikey konum Inter'deki gibi). Boşluklar akrabanın boşluklarından, Inter'deki oranla."""
+    cap, xh = sen.info.capHeight, sen.info.xHeight
+    log = {}
+
+    # Ω ← O
+    ig, iO, sO = InterGlyph("Ω"), InterGlyph("O"), SenGlyph(sen, "O")
+    s = cap / INTER_CAP
+    ty = solve(lambda t: o_top(iO.at(0, t)) * s, o_top(sO))
+    tx, sx = 0.0, s
+    for _ in range(6):
+        sx = (ink(sO)[2] - ink(sO)[0]) / (ink(iO.at(tx, ty))[2] - ink(iO.at(tx, ty))[0])
+        tx = solve(lambda t: o_side(iO.at(t, ty)) * sx, o_side(sO))
+    i_top, s_top = ink(iO.at(tx, ty))[3] * s, ink(sO)[3]
+
+    def ymap(y):
+        return cap + (y - cap) * (s_top - cap) / (i_top - cap) if y > cap else y
+
+    lsb, rsb = _ratio_sb(sen, "O", iO, ig, tx)
+    final, w = _fit(sen, ig.at(tx, ty), sx, s, ymap, lsb, rsb)
+    _new_glyph(sen, "Omega", 0x03A9, final, w)
+    log["Omega"] = {"inter_weight": [round(400 + tx * 500), round(400 + ty * 500)], "scale_x": round(sx, 4), "width": round(w)}
+
+    # λ ← v (çapraz kalınlığı), yükseklik l'ye
+    ig, iv, sv = InterGlyph("λ"), InterGlyph("v"), SenGlyph(sen, "v")
+    s = xh / INTER_XH
+
+    def diag(g, h):
+        return _w(runs_at_y(contours_of(g), h * 0.5)[0])
+
+    t, sx = 0.0, s
+    for _ in range(6):
+        sx = (ink(sv)[2] - ink(sv)[0]) / (ink(iv.at(t, t))[2] - ink(iv.at(t, t))[0])
+        t = solve(lambda u: diag(iv.at(u, u), INTER_XH) * sx, diag(sv, xh))
+    i_asc, s_asc = ink(InterGlyph("l").at(t, t))[3] * s, ink(SenGlyph(sen, "l"))[3]
+
+    def ymap(y):
+        return xh + (y - xh) * (s_asc - xh) / (i_asc - xh) if y > xh else y
+
+    lsb, rsb = _ratio_sb(sen, "v", iv, ig, t)
+    final, w = _fit(sen, ig.at(t, t), sx, s, ymap, lsb, rsb)
+    _new_glyph(sen, "lambda", 0x03BB, final, w)
+    log["lambda"] = {"inter_weight": round(400 + t * 500), "scale_x": round(sx, 4), "width": round(w)}
+
+    # → ← kısa çizgi: gövde kalınlığı Sen'in kısa çizgisine (Inter'deki ok/çizgi oranıyla). Dikey konum Inter'in:
+    # gövde ortası her ağırlıkta aynı yükseklikte, Regular'da ok başı tabana oturur. Sen'in kısa çizgisi alçak
+    # olduğundan gövdeyi ona ortalamak ok başını tabanın altına sarkıtıyordu (Regular -55, ExtraBold -105).
+    ig, ih, sh = InterGlyph("→"), InterGlyph("-"), SenGlyph(sen, "hyphen")
+    s = cap / INTER_CAP
+
+    def shaft(g):
+        x0, _, x1, _ = ink(g)
+        return runs_at_x(contours_of(g), x0 + 0.25 * (x1 - x0))[0]
+
+    def bar(g):
+        x0, y0, x1, y1 = ink(g)
+        return y1 - y0
+
+    ratio = _w(shaft(ig.at(0, 0))) / bar(ih.at(0, 0))
+    t = solve(lambda u: _w(shaft(ig.at(u, u))) * s, bar(sh) * ratio)
+    src = ig.at(t, t)
+    r = shaft(src)
+    lsb, rsb = _ratio_sb(sen, "hyphen", ih, ig, t)
+    final, w = _fit(sen, src, s, s, lambda y: y, lsb, rsb)
+    _new_glyph(sen, "arrowright", 0x2192, final, w)
+    log["arrowright"] = {"inter_weight": round(400 + t * 500), "shaft": round(_w(r) * s), "width": round(w)}
+    return log
+
+
 # Serifli I seçeneği (Inter'deki gibi cv08): Sen'in orijinal I'sı ve onu kullanan bileşikler
 CV08 = ["I", "Iacute", "Icircumflex", "Idieresis", "Idotaccent", "Igrave", "Imacron", "Iogonek"]
 
@@ -692,6 +789,7 @@ def harmonize(variant):
         cedilla_log = build_cedilla(sen, variant)
         j_log = build_j(sen, variant)
         lira_log = build_lira(sen, variant)
+        symbols_log = build_symbols(sen)
         marks_log = build_marks(sen)
         cuts = sen_cut_lengths(sen)
         log_tail = {}
@@ -723,6 +821,7 @@ def harmonize(variant):
         log[m]["marks"] = marks_log
         log[m]["j"] = j_log
         log[m]["lira"] = lira_log
+        log[m]["symbols"] = symbols_log
 
         for name in "ae":
             ig = inter[name]
