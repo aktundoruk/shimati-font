@@ -8,6 +8,13 @@ Doruk Aktun'un ilk yazı karakteri: arayüzler ve uzun metinler için değişken
 - Tanıtım sayfası: [`specimen/index.html`](specimen/index.html)
 - Ad: Akkadca *šīmāti*, "kaderler"; Mezopotamya mitolojisindeki Kader Tableti'nden (*ṭuppi šīmāti*).
 
+## Lisans
+
+- Font dosyaları ve font kaynakları (`dist/`, `sources/`, `variants/`, `build/`, `specimen/`):
+  [SIL Open Font License 1.1](OFL.txt). Sen ve Inter'in telif satırları korunur.
+- Betikler (`scripts/`): [MIT](LICENSE-CODE.txt).
+- `upstream/` altındaki kaynak fontlar kendi lisanslarıyla (OFL 1.1) birlikte durur.
+
 Aşağısı geliştirme notları: font, iki OFL fontun (Sen ve Inter) birleştirilip uyumlu hâle getirilmesiyle
 betiklerle üretiliyor.
 
@@ -49,7 +56,6 @@ Fontun çalışma adı **Shimati** (sürüm 1.000, Made by Doruk Aktun).
   (ölçü çizgileri, noktalar, tutamaçlar, gövde/taşma/çengel ölçüleri, iki master arasında interpole eden
   ağırlık kaydırıcısı), ağırlık ekseni çizimi, ölçü tablosu, glif inceleyici, Türkçe, ölçek, arayüz,
   OpenType (cv08, frac, sups), indirme. Açık/koyu tema; mobilde yatay taşma yok.
-- Proje hafızasının yedeği: `docs/hafiza/`.
 
 ## Yöntem (uyarlanmış varyant)
 
