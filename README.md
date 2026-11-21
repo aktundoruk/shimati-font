@@ -12,7 +12,7 @@ Doruk Aktun'un ilk yazı karakteri: arayüzler ve uzun metinler için değişken
 
 - Font dosyaları ve font kaynakları (`dist/`, `sources/`, `variants/`, `build/`, `specimen/`):
   [SIL Open Font License 1.1](OFL.txt). Sen ve Inter'in telif satırları korunur.
-- Betikler (`scripts/`): [MIT](LICENSE-CODE.txt).
+- Betikler (`scripts/`): [MIT](scripts/LICENSE.txt).
 - `upstream/` altındaki kaynak fontlar kendi lisanslarıyla (OFL 1.1) birlikte durur.
 
 Aşağısı geliştirme notları: font, iki OFL fontun (Sen ve Inter) birleştirilip uyumlu hâle getirilmesiyle
